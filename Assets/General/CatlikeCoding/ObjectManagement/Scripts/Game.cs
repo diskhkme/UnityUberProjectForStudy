@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 //Game 클래스 자체를 persistableObject 상속하도록 바꿈!
 public class Game : PersistableObject
@@ -18,15 +20,49 @@ public class Game : PersistableObject
     float creationProgress;
     float destructionProgress;
 
+    public int levelCount;
+    int loadLevelBuildIndex;
+
 
     List<Shape> shapes;
 
     //수정 이전의 save 파일(shape id가 없는 파일)도 로드할 수 있는 기능이 필요할 수 있음!
-    const int saveVersion = 1; 
+    const int saveVersion = 2; 
 
-    private void Awake()
+    private void Start()
     {
         shapes = new List<Shape>();
+
+        if(Application.isEditor)
+        {
+            for(int i=0;i<SceneManager.sceneCount;i++)
+            {
+                Scene loadedScene = SceneManager.GetSceneAt(i);
+                if(loadedScene.name.Contains("Level ")) //main scene과 병행해서 열리는 level이라면
+                {
+                    SceneManager.SetActiveScene(loadedScene);
+                    loadLevelBuildIndex = loadedScene.buildIndex;
+                    return;
+                }
+            }
+        }
+        
+        StartCoroutine(LoadLevel(1));
+    }
+
+    IEnumerator LoadLevel(int levelBuildIndex)
+    {
+        this.enabled = false;
+        if(loadLevelBuildIndex > 0)
+        {
+            yield return SceneManager.UnloadSceneAsync(loadLevelBuildIndex);
+        }
+        //두 개의 Scene을 동시에 열기 위해서는 매뉴얼 작업이 필요함 (현재 상태에서, 게임 전체를 관리하는 Main Scene과, 특정 level에 종속된 Level1 scene이 있음.
+        //따라서, 동시에 열려면 "Game" gameobject가 있는 Main Scene에서 Level 1의 load가 필요. LoadSceneMode.additive 필요
+        yield return SceneManager.LoadSceneAsync(levelBuildIndex, LoadSceneMode.Additive); //async loading. 문제는 로딩이 다 되기 전에도 update가 호출될 수 있다는 것. enabled로 제어해 주어야 함
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(levelBuildIndex)); //directional light를 level1에 넣어놨기 때문에 active scene을 바꾸어야 함....바꾸려면 시간이 걸리기 떄문에 코루틴으로 작성
+        loadLevelBuildIndex = levelBuildIndex;
+        this.enabled = true;
     }
 
     private void Update()
@@ -51,6 +87,18 @@ public class Game : PersistableObject
         else if(Input.GetKeyDown(destroyKey))
         {
             DestroyShape();
+        }
+        else
+        {
+            for(int i=1;i<=levelCount;i++)
+            {
+                if(Input.GetKeyDown(KeyCode.Alpha0 + i))
+                {
+                    BeginNewGame();
+                    StartCoroutine(LoadLevel(i));
+                    return;
+                }
+            }
         }
 
         creationProgress += Time.deltaTime * CreationSpeed;
@@ -114,6 +162,7 @@ public class Game : PersistableObject
     {
         //writer.Write(-saveVersion); //버전도 함께 저장, 이전 버전에는 version 정보가 없으므로, count와 구분을 위해 음수로 저장함 --> persistent storage에서 수행
         writer.Write(shapes.Count);
+        writer.Write(loadLevelBuildIndex); //이제는 어떤 scene에 연관된 object들인지까지 구분해서 저장
         for(int i=0;i<shapes.Count;i++)
         {
             writer.Write(shapes[i].ShapeId);
@@ -131,6 +180,7 @@ public class Game : PersistableObject
         }
 
         int count = version <= 0 ? -version : reader.ReadInt();
+        StartCoroutine(LoadLevel(version < 2 ? 1 : reader.ReadInt())); //로드 할때는 저장된 level까지 로드
         for (int i = 0; i < count; i++)
         {
             int shapeId = version > 0 ? reader.ReadInt() : 0;
