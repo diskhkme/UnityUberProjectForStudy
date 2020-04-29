@@ -74,7 +74,8 @@ public class Game : PersistableObject
     {
         for(int i=0;i<shapes.Count;i++)
         {
-            Destroy(shapes[i].gameObject);
+            //Destroy(shapes[i].gameObject);
+            shapeFactory.Reclaim(shapes[i]);
         }
         shapes.Clear();
     }
@@ -98,7 +99,8 @@ public class Game : PersistableObject
         if(shapes.Count>0)
         {
             int index = Random.Range(0, shapes.Count);
-            Destroy(shapes[index].gameObject);
+            //Destroy(shapes[index].gameObject);
+            shapeFactory.Reclaim(shapes[index]);
 
             //List에서 객체를 제거할때, 빈 칸을 채우는 shift가 일어나지 않도록 하기 위해 지울 index ref와 마지막 index ref를 스왑한 후 삭제
             int lastIndex = shapes.Count - 1;
