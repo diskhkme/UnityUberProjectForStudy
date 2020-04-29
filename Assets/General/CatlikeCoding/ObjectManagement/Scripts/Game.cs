@@ -11,6 +11,13 @@ public class Game : PersistableObject
     public KeyCode newGameKey = KeyCode.N;
     public KeyCode saveKey = KeyCode.S;
     public KeyCode loadKey = KeyCode.L;
+    public KeyCode destroyKey = KeyCode.X;
+
+    public float CreationSpeed { get; set; }
+    public float DestructionSpeed { get; set; }
+    float creationProgress;
+    float destructionProgress;
+
 
     List<Shape> shapes;
 
@@ -41,6 +48,26 @@ public class Game : PersistableObject
             BeginNewGame();
             storage.Load(this);
         }
+        else if(Input.GetKeyDown(destroyKey))
+        {
+            DestroyShape();
+        }
+
+        creationProgress += Time.deltaTime * CreationSpeed;
+        //if(creationProgress >= 1f)
+        while(creationProgress >= 1f) //creationprogress 가 2 이상으로 커질 수도 있음을 감안하면,
+        {
+            //creationProgress = 0f;
+            creationProgress -= 1f;
+            CreateShape();
+        }
+
+        destructionProgress += Time.deltaTime * DestructionSpeed;
+        while (destructionProgress >= 1f) //creationprogress 가 2 이상으로 커질 수도 있음을 감안하면,
+        {
+            destructionProgress -= 1f;
+            DestroyShape();
+        }
     }
 
     private void BeginNewGame()
@@ -64,6 +91,21 @@ public class Game : PersistableObject
                                            valueMin: 0.25f, valueMax: 1f, 
                                            alphaMin: 1f, alphaMax: 1f));
         shapes.Add(instance);
+    }
+
+    void DestroyShape()
+    {
+        if(shapes.Count>0)
+        {
+            int index = Random.Range(0, shapes.Count);
+            Destroy(shapes[index].gameObject);
+
+            //List에서 객체를 제거할때, 빈 칸을 채우는 shift가 일어나지 않도록 하기 위해 지울 index ref와 마지막 index ref를 스왑한 후 삭제
+            int lastIndex = shapes.Count - 1;
+            shapes[index] = shapes[lastIndex];
+            shapes.RemoveAt(lastIndex);
+        }
+        
     }
 
     public override void Save(GameDataWriter writer)
