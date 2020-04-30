@@ -194,7 +194,7 @@ MonoBehaviour:
   saveKey: 115
   loadKey: 108
   destroyKey: 120
-  levelCount: 2
+  levelCount: 3
 --- !u!4 &91447690
 Transform:
   m_ObjectHideFlags: 0
@@ -1246,10 +1246,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2049917323}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c768e5b6f69961429ebc4cd8ace899c, type: 3}
+  m_Script: {fileID: 11500000, guid: 8272f40e76b980d4d8d0bc37ba839aae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  savePath: 
 --- !u!4 &2049917325
 Transform:
   m_ObjectHideFlags: 0
