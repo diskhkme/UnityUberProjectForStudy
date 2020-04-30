@@ -151,12 +151,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41b598712fefcff4093e2bbfe0d1cf97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    movementDirection: 1
+    speed:
+      min: 2
+      max: 3
   spawnZones:
   - {fileID: 1215673431}
   - {fileID: 1259104321}
   - {fileID: 1955014090}
   - {fileID: 1684350872}
   sequencial: 1
+  overrideConfig: 1
 --- !u!4 &890927171
 Transform:
   m_ObjectHideFlags: 0
@@ -218,6 +224,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cfb2485f5bb0414faa222b0314e389f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    movementDirection: 0
+    speed:
+      min: 1
+      max: 2
   surfaceOnly: 0
 --- !u!1 &1259104319
 GameObject:
@@ -262,6 +273,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cfb2485f5bb0414faa222b0314e389f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    movementDirection: 0
+    speed:
+      min: 1
+      max: 2
   surfaceOnly: 1
 --- !u!1 &1529926684
 GameObject:
@@ -338,6 +354,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b75f9fd003964d94d96ce215da1d1672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    movementDirection: 2
+    speed:
+      min: 1
+      max: 2
   surfaceOnly: 1
 --- !u!4 &1684350873
 Transform:
@@ -488,4 +509,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b75f9fd003964d94d96ce215da1d1672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    movementDirection: 1
+    speed:
+      min: 1
+      max: 2
   surfaceOnly: 0
