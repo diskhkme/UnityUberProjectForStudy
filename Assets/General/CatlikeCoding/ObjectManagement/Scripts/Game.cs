@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Game : PersistableObject
 {
@@ -21,8 +22,11 @@ public class Game : PersistableObject
     [SerializeField] float DestructionSpeed { get; set; }
     float creationProgress;
     float destructionProgress;
+    [SerializeField] Slider creationSpeedSlider;
+    [SerializeField] Slider destructionSpeedSlider;
     Random.State mainRandomState;
     [SerializeField] bool reseedOnLoad; //게임을 시작할때 seed를 새로 할당할 것인지, 재사용할 것인지를 optional로 둠
+    
 
     [SerializeField] int levelCount;
     int loadLevelBuildIndex;
@@ -58,9 +62,11 @@ public class Game : PersistableObject
 
     IEnumerator LoadLevel(int levelBuildIndex)
     {
+        Debug.Log("Loading Scene " + levelBuildIndex.ToString());
         this.enabled = false;
         if(loadLevelBuildIndex > 0)
         {
+            Debug.Log("Unload Scene " + loadLevelBuildIndex.ToString());
             yield return SceneManager.UnloadSceneAsync(loadLevelBuildIndex);
         }
         
@@ -72,33 +78,33 @@ public class Game : PersistableObject
 
     private void Update()
     {
-        if(Input.GetKeyDown(createKey))
+        if (Input.GetKeyDown(createKey))
         {
             CreateShape();
         }
-        else if(Input.GetKeyDown(newGameKey))
+        else if (Input.GetKeyDown(newGameKey))
         {
             BeginNewGame();
             StartCoroutine(LoadLevel(loadLevelBuildIndex));
         }
-        else if(Input.GetKeyDown(saveKey))
+        else if (Input.GetKeyDown(saveKey))
         {
             storage.Save(this, saveVersion);
         }
-        else if(Input.GetKeyDown(loadKey))
+        else if (Input.GetKeyDown(loadKey))
         {
             BeginNewGame();
             storage.Load(this);
         }
-        else if(Input.GetKeyDown(destroyKey))
+        else if (Input.GetKeyDown(destroyKey))
         {
             DestroyShape();
         }
         else
         {
-            for(int i=1;i<=levelCount;i++)
+            for (int i = 1; i <= levelCount; i++)
             {
-                if(Input.GetKeyDown(KeyCode.Alpha0 + i))
+                if (Input.GetKeyDown(KeyCode.Alpha0 + i))
                 {
                     BeginNewGame();
                     StartCoroutine(LoadLevel(i));
@@ -107,8 +113,14 @@ public class Game : PersistableObject
             }
         }
 
+    }
+
+    //생성과 파괴를 일정한 간격으로 수행하기 위해 fixedupdate에서 수행
+    //기본적으로는 물리 계산에 사용되지만, 지금처럼 reproducible time이 필요할때도 유용함.
+    private void FixedUpdate()
+    {
         creationProgress += Time.deltaTime * CreationSpeed;
-        while(creationProgress >= 1f) 
+        while (creationProgress >= 1f)
         {
             creationProgress -= 1f;
             CreateShape();
@@ -128,6 +140,10 @@ public class Game : PersistableObject
         int seed = Random.Range(0, int.MaxValue) ^ (int)Time.unscaledDeltaTime; //bitwise or과 time을 사용해 랜덤 강화
         mainRandomState = Random.state;
         Random.InitState(seed);
+
+        //slider에 적용은 매뉴얼하게 해 주어야 함
+        creationSpeedSlider.value = CreationSpeed = 0f;
+        destructionSpeedSlider.value = DestructionSpeed = 0f;
 
         for(int i=0;i<shapes.Count;i++)
         {
@@ -168,6 +184,10 @@ public class Game : PersistableObject
     {
         writer.Write(shapes.Count);
         writer.Write(Random.state); //Random State를 함께 저장
+        writer.Write(CreationSpeed);
+        writer.Write(creationProgress); //creation과 destruction도 저장
+        writer.Write(DestructionSpeed);
+        writer.Write(destructionProgress);
         writer.Write(loadLevelBuildIndex);
         GameLevel.Current.Save(writer);
         for(int i=0;i<shapes.Count;i++)
@@ -200,6 +220,11 @@ public class Game : PersistableObject
             {
                 Random.state = state; //reseed를 하지 않는다는 이야기는 저장된 seed를 사용하겠다는 뜻
             }
+            creationSpeedSlider.value = CreationSpeed = reader.ReadFloat();
+            creationProgress = reader.ReadFloat();
+            destructionSpeedSlider.value = DestructionSpeed = reader.ReadFloat();
+            destructionProgress = reader.ReadFloat();
+
         }
 
         //loadlevel이 끝난 뒤 shape들이 불러와지도록 yield return 활용
