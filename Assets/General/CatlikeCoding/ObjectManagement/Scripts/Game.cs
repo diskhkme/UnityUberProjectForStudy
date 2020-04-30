@@ -6,28 +6,36 @@ using UnityEngine.SceneManagement;
 //Game 클래스 자체를 persistableObject 상속하도록 바꿈!
 public class Game : PersistableObject
 {
-    public ShapeFactory shapeFactory;
-    public PersistentStorage storage;
+    public static Game Instance { get; private set; } //spawnZone 참조 추가를 Game에서도 할 수 있지만, 역할을 분리하기 위해 level이 Game에 등록하는 형식으로 구현하기 위해 static 추가
 
-    public KeyCode createKey = KeyCode.C;
-    public KeyCode newGameKey = KeyCode.N;
-    public KeyCode saveKey = KeyCode.S;
-    public KeyCode loadKey = KeyCode.L;
-    public KeyCode destroyKey = KeyCode.X;
+    //Game instance가 있으므로, public일 필요 없을 것
+    [SerializeField] ShapeFactory shapeFactory;
+    [SerializeField] PersistentStorage storage;
 
-    public float CreationSpeed { get; set; }
-    public float DestructionSpeed { get; set; }
+    [SerializeField] KeyCode createKey = KeyCode.C;
+    [SerializeField] KeyCode newGameKey = KeyCode.N;
+    [SerializeField] KeyCode saveKey = KeyCode.S;
+    [SerializeField] KeyCode loadKey = KeyCode.L;
+    [SerializeField] KeyCode destroyKey = KeyCode.X;
+
+    public SpawnZone spawnZoneOfLevel { get; set; } //다른 scene의 go를 참조하는 것에는 문제가 존재. public으로 direct referencing을 하지 않고 property를 활용
+    [SerializeField] float CreationSpeed { get; set; }
+    [SerializeField] float DestructionSpeed { get; set; }
     float creationProgress;
     float destructionProgress;
 
-    public int levelCount;
+    [SerializeField] int levelCount;
     int loadLevelBuildIndex;
-
-
+    
     List<Shape> shapes;
 
-    //수정 이전의 save 파일(shape id가 없는 파일)도 로드할 수 있는 기능이 필요할 수 있음!
-    const int saveVersion = 2; 
+    const int saveVersion = 2;
+
+    //private void Awake( //플레이 도중이면 awake면 되지만, editor에서도 문제 없기 위해 onenable event 사용
+    private void OnEnable()
+    {
+        Instance = this; //Instance singleton으로 구현할 수도 있지만, lgical하게 Game은 한 번 로딩되고 다시 로딩되지 않으므로 이 정도면 ok.
+    }
 
     private void Start()
     {
@@ -132,7 +140,7 @@ public class Game : PersistableObject
     {
         Shape instance = shapeFactory.GetRandom();
         Transform t = instance.transform;
-        t.localPosition = Random.insideUnitSphere * 5f;
+        t.localPosition = spawnZoneOfLevel.SpawnPoint;
         t.localRotation = Random.rotation;
         t.localScale = Vector3.one * Random.Range(0.1f, 1f);
         instance.SetColor(Random.ColorHSV(hueMin: 0f, hueMax: 1f, 
