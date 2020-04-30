@@ -79,6 +79,7 @@ public class Game : PersistableObject
         else if(Input.GetKeyDown(newGameKey))
         {
             BeginNewGame();
+            StartCoroutine(LoadLevel(loadLevelBuildIndex));
         }
         else if(Input.GetKeyDown(saveKey))
         {

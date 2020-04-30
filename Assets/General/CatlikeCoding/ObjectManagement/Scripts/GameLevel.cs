@@ -8,9 +8,16 @@ public class GameLevel : PersistableObject
 
     [SerializeField] SpawnZone spawnZone;
 
+    //상태를 저장해야 하는 persistable object들을 game level에서 관리
+    [SerializeField] PersistableObject[] persistentObjects; 
+
     private void OnEnable()
     {
         Current = this;
+        if(persistentObjects == null)
+        {
+            persistentObjects = new PersistableObject[0];
+        }
     }
 
     public Vector3 SpawnPoint //spawnPoint 자체를 game level이 대리
@@ -23,11 +30,19 @@ public class GameLevel : PersistableObject
 
     public override void Save(GameDataWriter writer)
     {
-        base.Save(writer);
+        writer.Write(persistentObjects.Length);
+        for(int i=0;i<persistentObjects.Length;i++)
+        {
+            persistentObjects[i].Save(writer);
+        }
     }
 
     public override void Load(GameDataReader reader)
     {
-        base.Load(reader);
+        int savedCount = reader.ReadInt();
+        for(int i=0;i<savedCount;i++)
+        {
+            persistentObjects[i].Load(reader);
+        }
     }
 }
