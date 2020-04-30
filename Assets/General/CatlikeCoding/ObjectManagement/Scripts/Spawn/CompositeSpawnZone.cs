@@ -29,6 +29,25 @@ public class CompositeSpawnZone : SpawnZone
         }
     }
 
+    //composite spawn zone의 경우 다른 처리가 필요하므로 override
+    public override void ConfigureSpawn(Shape shape)
+    {
+        int index;
+        if(sequencial)
+        {
+            index = nextSequentialIndex++;
+            if(nextSequentialIndex >= spawnZones.Length)
+            {
+                nextSequentialIndex = 0;
+            }
+        }
+        else
+        {
+            index = Random.Range(0, spawnZones.Length);
+        }
+        spawnZones[index].ConfigureSpawn(shape);
+    }
+
     public override void Save(GameDataWriter writer)
     {
         //추가적으로 저장할 game state data

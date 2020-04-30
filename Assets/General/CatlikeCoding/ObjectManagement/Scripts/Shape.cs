@@ -44,6 +44,7 @@ public class Shape : PersistableObject
     }
 
     public Vector3 AngularVelocity { get; set; }
+    public Vector3 Velocity { get; set; }
 
     private void Awake()
     {
@@ -54,6 +55,7 @@ public class Shape : PersistableObject
     public void GameUpdate()
     {
         this.transform.Rotate(AngularVelocity * Time.deltaTime);
+        this.transform.localPosition += Velocity * Time.deltaTime;
     }
 
     public override void Save(GameDataWriter writer)
@@ -61,6 +63,7 @@ public class Shape : PersistableObject
         base.Save(writer);
         writer.Write(color);
         writer.Write(AngularVelocity);
+        writer.Write(Velocity);
     }
 
     public override void Load(GameDataReader reader)
@@ -68,6 +71,7 @@ public class Shape : PersistableObject
         base.Load(reader);
         SetColor(reader.Version > 0 ? reader.ReadColor() : Color.white);
         AngularVelocity = reader.Version >= 4 ? reader.ReadVector3() : Vector3.zero;
+        Velocity = reader.Version >= 4 ? reader.ReadVector3() : Vector3.zero;
     }
 
 

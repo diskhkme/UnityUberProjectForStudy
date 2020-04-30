@@ -20,12 +20,9 @@ public class GameLevel : PersistableObject
         }
     }
 
-    public Vector3 SpawnPoint //spawnPoint 자체를 game level이 대리
+    public void ConfigureSpawn(Shape shape)
     {
-        get
-        {
-            return spawnZone.SpawnPoint;
-        }
+        spawnZone.ConfigureSpawn(shape);
     }
 
     public override void Save(GameDataWriter writer)
