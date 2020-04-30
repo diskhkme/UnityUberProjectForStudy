@@ -41,4 +41,12 @@ public class GameDataWriter
         writer.Write(color.b);
         writer.Write(color.a);
     }
+
+    //Random 시퀀스를 이어나가고 싶다고 가정하고, 그 상태를 저장
+    public void Write(Random.State value)
+    {
+        //Random 시퀀스는 4개의 floating point 데이터지만, 접근은 불가.
+        //JSON serialization을 사용해 저장
+        writer.Write(JsonUtility.ToJson(value));
+    }
 }

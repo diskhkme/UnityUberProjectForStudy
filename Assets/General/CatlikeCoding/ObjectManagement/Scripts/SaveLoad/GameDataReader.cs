@@ -15,6 +15,11 @@ public class GameDataReader
         this.Version = version;
     }
 
+    public Random.State ReadRandomState()
+    {
+        return JsonUtility.FromJson<Random.State>(reader.ReadString());
+    }
+
     public float ReadFloat()
     {
         return reader.ReadSingle();
