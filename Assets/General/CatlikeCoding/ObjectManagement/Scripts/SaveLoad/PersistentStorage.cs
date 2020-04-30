@@ -21,9 +21,9 @@ public class PersistentStorage : MonoBehaviour
 
     public void Load(PersistableObject o)
     {
-        using (var reader = new BinaryReader(File.Open(savePath, FileMode.Open)))
-        {
-            o.Load(new GameDataReader(reader,-reader.ReadInt32()));
-        }
+        //load에서 using을 활용하면, game에서 코루틴을 활용한 load에 문제가 생기므로, buffer를 사용해서 임시로 데이터 저장
+        byte[] data = File.ReadAllBytes(savePath);
+        var reader = new BinaryReader(new MemoryStream(data));
+        o.Load(new GameDataReader(reader, -reader.ReadInt32()));
     }
 }

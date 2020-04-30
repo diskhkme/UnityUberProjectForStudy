@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Game : PersistableObject
 {
-    public static Game Instance { get; private set; } 
+    //Gamelevel이 spawnpoint를 대리하므로, static도 필요 없어짐
 
     [SerializeField] ShapeFactory shapeFactory;
     [SerializeField] PersistentStorage storage;
@@ -16,7 +16,7 @@ public class Game : PersistableObject
     [SerializeField] KeyCode loadKey = KeyCode.L;
     [SerializeField] KeyCode destroyKey = KeyCode.X;
 
-    public SpawnZone spawnZoneOfLevel { get; set; }
+    //public SpawnZone spawnZoneOfLevel { get; set; } //이제 게임이 spawnzone을 가질 필요 없음. Gamelevel이 spawnpoint를 대리하므로
     [SerializeField] float CreationSpeed { get; set; }
     [SerializeField] float DestructionSpeed { get; set; }
     float creationProgress;
@@ -30,11 +30,6 @@ public class Game : PersistableObject
     List<Shape> shapes;
 
     const int saveVersion = 3;
-
-    private void OnEnable()
-    {
-        Instance = this;
-    }
 
     private void Start()
     {
@@ -144,7 +139,7 @@ public class Game : PersistableObject
     {
         Shape instance = shapeFactory.GetRandom();
         Transform t = instance.transform;
-        t.localPosition = spawnZoneOfLevel.SpawnPoint;
+        t.localPosition = GameLevel.Current.SpawnPoint;
         t.localRotation = Random.rotation;
         t.localScale = Vector3.one * Random.Range(0.1f, 1f);
         instance.SetColor(Random.ColorHSV(hueMin: 0f, hueMax: 1f, 
@@ -172,7 +167,8 @@ public class Game : PersistableObject
     {
         writer.Write(shapes.Count);
         writer.Write(Random.state); //Random State를 함께 저장
-        writer.Write(loadLevelBuildIndex); 
+        writer.Write(loadLevelBuildIndex);
+        GameLevel.Current.Save(writer);
         for(int i=0;i<shapes.Count;i++)
         {
             writer.Write(shapes[i].ShapeId);
@@ -188,19 +184,30 @@ public class Game : PersistableObject
         {
             Debug.LogError("Unsupported future save version " + version);
         }
+        StartCoroutine(LoadGame(reader));
+    }
 
+    IEnumerator LoadGame(GameDataReader reader)
+    {
+        int version = reader.Version;
         int count = version <= 0 ? -version : reader.ReadInt();
 
-        if(version >= 3)
+        if (version >= 3)
         {
             Random.State state = reader.ReadRandomState();
-            if(!reseedOnLoad)
+            if (!reseedOnLoad)
             {
                 Random.state = state; //reseed를 하지 않는다는 이야기는 저장된 seed를 사용하겠다는 뜻
             }
         }
 
-        StartCoroutine(LoadLevel(version < 2 ? 1 : reader.ReadInt()));
+        //loadlevel이 끝난 뒤 shape들이 불러와지도록 yield return 활용
+        yield return LoadLevel(version < 2 ? 1 : reader.ReadInt());
+        if(version >= 3)
+        {
+            GameLevel.Current.Load(reader);
+        }
+
         for (int i = 0; i < count; i++)
         {
             int shapeId = version > 0 ? reader.ReadInt() : 0;
@@ -210,5 +217,4 @@ public class Game : PersistableObject
             shapes.Add(instance);
         }
     }
-
 }
