@@ -156,6 +156,22 @@ MonoBehaviour:
     speed:
       min: 2
       max: 3
+    angularSpeed:
+      min: 2
+      max: 3
+    scale:
+      min: 1
+      max: 1
+    color:
+      hue:
+        min: 0.75140274
+        max: 1
+      saturation:
+        min: 0
+        max: 1
+      value:
+        min: 0
+        max: 1
   spawnZones:
   - {fileID: 1215673431}
   - {fileID: 1259104321}
@@ -229,6 +245,22 @@ MonoBehaviour:
     speed:
       min: 1
       max: 2
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0
+      max: 0
+    color:
+      hue:
+        min: 0.14357165
+        max: 0.5534277
+      saturation:
+        min: 0
+        max: 0
+      value:
+        min: 0
+        max: 0
   surfaceOnly: 0
 --- !u!1 &1259104319
 GameObject:
@@ -278,6 +310,22 @@ MonoBehaviour:
     speed:
       min: 1
       max: 2
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0
+      max: 0
+    color:
+      hue:
+        min: 0
+        max: 0
+      saturation:
+        min: 0
+        max: 0
+      value:
+        min: 0
+        max: 0
   surfaceOnly: 1
 --- !u!1 &1529926684
 GameObject:
@@ -359,6 +407,22 @@ MonoBehaviour:
     speed:
       min: 1
       max: 2
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0
+      max: 0
+    color:
+      hue:
+        min: 0
+        max: 0
+      saturation:
+        min: 0
+        max: 0
+      value:
+        min: 0
+        max: 0
   surfaceOnly: 1
 --- !u!4 &1684350873
 Transform:
@@ -514,4 +578,20 @@ MonoBehaviour:
     speed:
       min: 1
       max: 2
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0
+      max: 0
+    color:
+      hue:
+        min: 0
+        max: 0
+      saturation:
+        min: 0
+        max: 0
+      value:
+        min: 0
+        max: 0
   surfaceOnly: 0
