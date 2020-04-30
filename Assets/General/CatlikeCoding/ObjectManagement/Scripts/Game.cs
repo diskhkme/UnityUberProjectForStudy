@@ -33,7 +33,7 @@ public class Game : PersistableObject
     
     List<Shape> shapes;
 
-    const int saveVersion = 3;
+    const int saveVersion = 4;
 
     private void Start()
     {
@@ -115,10 +115,14 @@ public class Game : PersistableObject
 
     }
 
-    //생성과 파괴를 일정한 간격으로 수행하기 위해 fixedupdate에서 수행
-    //기본적으로는 물리 계산에 사용되지만, 지금처럼 reproducible time이 필요할때도 유용함.
     private void FixedUpdate()
     {
+        // update 해야 할 object들이 fully reference되어 있을때는 할 만한 작업
+        for(int i=0;i<shapes.Count;i++)
+        {
+            shapes[i].GameUpdate();
+        }
+
         creationProgress += Time.deltaTime * CreationSpeed;
         while (creationProgress >= 1f)
         {
@@ -163,6 +167,7 @@ public class Game : PersistableObject
                                            saturationMin: 0.5f, saturationMax: 1f, 
                                            valueMin: 0.25f, valueMax: 1f, 
                                            alphaMin: 1f, alphaMax: 1f));
+        instance.AngularVelocity = Random.onUnitSphere * Random.Range(0f, 90f); //shape rotation
         shapes.Add(instance);
     }
 
