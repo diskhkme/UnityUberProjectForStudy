@@ -151,6 +151,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b75f9fd003964d94d96ce215da1d1672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: b2c4e14284b26d34b9d7ced3cff1340f, type: 2}
+    - {fileID: 11400000, guid: 02f8da1eea422b9419fe3088c7350634, type: 2}
+    movementDirection: 0
+    speed:
+      min: 0
+      max: 0
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0.1
+      max: 1
+    oscillationDirection: 2
+    oscillationAmplitude:
+      min: 0.1
+      max: 1
+    oscilllationFrequency:
+      min: 1
+      max: 1
+    color:
+      hue:
+        min: 0
+        max: 1
+      saturation:
+        min: 0
+        max: 1
+      value:
+        min: 0
+        max: 1
+    uniformColor: 0
   surfaceOnly: 1
 --- !u!4 &890927171
 Transform:
@@ -161,7 +193,7 @@ Transform:
   m_GameObject: {fileID: 890927169}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 3.83, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -196,6 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnZone: {fileID: 890927170}
+  persistentObjects: []
 --- !u!4 &1529926686
 Transform:
   m_ObjectHideFlags: 0
