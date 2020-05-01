@@ -16,6 +16,29 @@ public class ShapeFactory : ScriptableObject
     //따라서 2의 방법으로 구현
     Scene poolScene;
 
+    //shape id처럼 factoryid도 자동 생성. scriptable object는 editor가 살아있는동안 살아있음. 
+    [System.NonSerialized]
+    int factoryId = int.MinValue;
+    public int FactoryId
+    {
+        get
+        {
+            return factoryId;
+        }
+        set
+        {
+            if(factoryId == int.MinValue && value != int.MinValue)
+            {
+                factoryId = value;
+            }
+            else
+            {
+                Debug.Log("Not allwed to change factoryId.");
+            }
+        }
+
+    }
+
     public Shape Get(int shapeId = 0, int materialId = 0)
     {
         Shape instance;
@@ -35,6 +58,7 @@ public class ShapeFactory : ScriptableObject
             else //pool에 아무것도 없을 때
             {
                 instance = Instantiate(prefabs[shapeId]);
+                instance.OriginFactory = this;
                 instance.ShapeId = shapeId;
                 SceneManager.MoveGameObjectToScene(instance.gameObject, poolScene); //특정 scene으로 gameobject를 옮기는 방법
             }
@@ -87,6 +111,12 @@ public class ShapeFactory : ScriptableObject
 
     public void Reclaim(Shape shapeToRecycle)
     {
+        if(shapeToRecycle.OriginFactory != this)
+        {
+            Debug.LogError("Tried to reclaim shape with wrong factory.");
+            return;
+        }
+
         if(recycle) //플레이 도중에 recycle을 바꾸면, pool에 아무것도 없을 떄 reclaim되는 오류가 생길 수 있으므로 확인차 작성
         {
             if(pools == null)

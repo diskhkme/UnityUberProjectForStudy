@@ -71,6 +71,31 @@ public class Shape : PersistableObject
 
     public Vector3 AngularVelocity { get; set; }
     public Vector3 Velocity { get; set; }
+    //어느 factory에서 생긴 shape인지를 추적. 이 정보를 가지고 있지 않으면, reclaim할 때 다른 factory에서 찾으려 할 수 있음.
+    ShapeFactory originFactory;
+    public ShapeFactory OriginFactory
+    {
+        get
+        {
+            return originFactory;
+        }
+        set
+        {
+            if(originFactory == null)
+            {
+                originFactory = value;
+            }
+            else
+            {
+                Debug.LogError("Not allowed to chage origin factory.");
+            }
+        }
+    }
+
+    public void Recycle()
+    {
+        OriginFactory.Reclaim(this);
+    }
 
     private void Awake()
     {

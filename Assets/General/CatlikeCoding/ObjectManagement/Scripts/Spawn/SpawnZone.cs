@@ -9,7 +9,8 @@ public abstract class SpawnZone : PersistableObject
         {
             Forward, Upward, Outward, Random
         }
-
+        //zone마다 factory를 선택 가능하도록
+        public ShapeFactory[] factories;
         public MovementDirection movementDirection;
         public FloatRange speed;
         public FloatRange angularSpeed;
@@ -23,9 +24,11 @@ public abstract class SpawnZone : PersistableObject
     public abstract Vector3 SpawnPoint { get; }
     
 
-    //Spawn zone별로 다른 velocity를 주기 위함.
-    public virtual void ConfigureSpawn(Shape shape)
+    //이제 shape의 spawn을 game에서 zone의 역할로 가져옴
+    public virtual Shape SpawnShape()
     {
+        int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
+        Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
         Transform t = shape.transform;
         t.localPosition = SpawnPoint;
         t.localRotation = Random.rotation;
@@ -61,8 +64,9 @@ public abstract class SpawnZone : PersistableObject
                 break;
         }
         
-
         shape.Velocity = direction * spawnConfig.speed.RandomValueInRange; //velocity 경향성을 주도록 변경
+
+        return shape;
     }
     
 }
