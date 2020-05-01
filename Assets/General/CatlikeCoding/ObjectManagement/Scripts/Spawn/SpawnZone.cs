@@ -29,7 +29,7 @@ public abstract class SpawnZone : PersistableObject
     
 
     //이제 shape의 spawn을 game에서 zone의 역할로 가져옴
-    public virtual Shape SpawnShape()
+    public virtual void SpawnShape()
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
@@ -37,38 +37,57 @@ public abstract class SpawnZone : PersistableObject
         t.localPosition = SpawnPoint;
         t.localRotation = Random.rotation;
         t.localScale = Vector3.one * spawnConfig.scale.RandomValueInRange;
-        if(spawnConfig.uniformColor)
-        {
-            shape.SetColor(spawnConfig.color.RandomInRange);
-        }
-        else
-        {
-            for(int i=0;i<shape.ColorCount;i++)
-            {
-                shape.SetColor(spawnConfig.color.RandomInRange, i);
-            }
-        }
+        SetupColor(shape);
 
         float angularSpeed = spawnConfig.angularSpeed.RandomValueInRange;
-        if(angularSpeed != 0f) //필요한 경우에만 컴포넌트로 추가
+        if (angularSpeed != 0f) //필요한 경우에만 컴포넌트로 추가
         {
             //var rotation = shape.gameObject.AddComponent<RotationShapeBehavior>();
             var rotation = shape.AddBehavior<RotationShapeBehavior>();
             rotation.AngularVelocity = Random.onUnitSphere * angularSpeed;
         }
-        
+
         float speed = spawnConfig.speed.RandomValueInRange;
-        if(speed != 0f)
+        if (speed != 0f)
         {
             var movement = shape.AddBehavior<MovementShapeBehavior>();
             movement.Velocity = GetDirectionVector(spawnConfig.movementDirection, t) * speed;
         }
 
         SetupOscillation(shape);
-        
-        return shape;
+
+        CreateSatelliteFor(shape);
     }
 
+    //특정 shape에 딸려 생기는 위성 shape 생성
+    void CreateSatelliteFor(Shape focalShape)
+    {
+        int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
+        Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
+        Transform t = shape.transform;
+        t.localRotation = Random.rotation;
+        t.localScale = focalShape.transform.localScale * 0.5f;
+        t.localPosition = focalShape.transform.localPosition + Vector3.up;
+        shape.AddBehavior<MovementShapeBehavior>().Velocity = Vector3.up;
+        SetupColor(shape);
+        //return을 해야 game에 가서 update loop를 돌게 되는데, 아직 없음. 확장 필요. Game 에 instance 생성
+    }
+
+    private void SetupColor(Shape shape)
+    {
+        if (spawnConfig.uniformColor)
+        {
+            shape.SetColor(spawnConfig.color.RandomInRange);
+        }
+        else
+        {
+            for (int i = 0; i < shape.ColorCount; i++)
+            {
+                shape.SetColor(spawnConfig.color.RandomInRange, i);
+            }
+        }
+    }
+       
     void SetupOscillation(Shape shape)
     {
         float amplitude = spawnConfig.oscillationAmplitude.RandomValueInRange;

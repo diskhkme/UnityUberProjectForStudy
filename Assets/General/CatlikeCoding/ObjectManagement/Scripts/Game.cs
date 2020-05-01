@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class Game : PersistableObject
 {
-    //Gamelevel이 spawnpoint를 대리하므로, static도 필요 없어짐
+    public static Game Instance { get; private set; }
 
     [SerializeField] ShapeFactory[] shapeFactories;
     [SerializeField] PersistentStorage storage;
@@ -37,7 +37,7 @@ public class Game : PersistableObject
 
     private void OnEnable()
     {
-        //...
+        Instance = this;
         if(shapeFactories[0].FactoryId != 0)
         {
             for (int i = 0; i < shapeFactories.Length; i++)
@@ -92,7 +92,7 @@ public class Game : PersistableObject
     {
         if (Input.GetKeyDown(createKey))
         {
-            CreateShape();
+            GameLevel.Current.SpawnShape();
         }
         else if (Input.GetKeyDown(newGameKey))
         {
@@ -139,7 +139,7 @@ public class Game : PersistableObject
         while (creationProgress >= 1f)
         {
             creationProgress -= 1f;
-            CreateShape();
+            GameLevel.Current.SpawnShape();
         }
 
         destructionProgress += Time.deltaTime * DestructionSpeed;
@@ -168,9 +168,9 @@ public class Game : PersistableObject
         shapes.Clear();
     }
 
-    void CreateShape()
+    public void AddShape(Shape shape)
     {
-        shapes.Add(GameLevel.Current.SpawnShape());
+        shapes.Add(shape);
     }
 
     void DestroyShape()
@@ -249,7 +249,6 @@ public class Game : PersistableObject
             int materialId = version > 0 ? reader.ReadInt() : 0;
             Shape instance = shapeFactories[factoryId].Get(shapeId, materialId);
             instance.Load(reader);
-            shapes.Add(instance);
         }
     }
 }
