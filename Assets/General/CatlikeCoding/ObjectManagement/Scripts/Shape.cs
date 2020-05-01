@@ -75,10 +75,12 @@ public class Shape : PersistableObject
     ShapeFactory originFactory;
     List<ShapeBehavior> behaviorList = new List<ShapeBehavior>(); //shape의 behavior를 업데이트 시키기 위한 리스트를 매뉴얼하게 관리
 
-    //shape에 behavior 추가하는 제네릭 메소드 구현
-    public T AddBehavior<T> () where T : ShapeBehavior
+    //shape에 behavior 추가하는 제네릭 메소드 구현, 뒤쪽의 new()는 기본 생성자가 있다고 알려주는 것.
+    public T AddBehavior<T> () where T : ShapeBehavior, new()
     {
-        T behavior = this.gameObject.AddComponent<T>();
+        //shapebehavior가 더이상 mono가 아니므로, addcomponent 불가능
+        //T behavior = this.gameObject.AddComponent<T>(); 
+        T behavior = ShapeBehaviorPool<T>.Get();
         behaviorList.Add(behavior);
         return behavior;
     }
@@ -107,7 +109,8 @@ public class Shape : PersistableObject
         //pool에서 재사용될 때 shape behavior가 계속 생성되므로, pool에 반납할 때 component 제거. 당연히 좀 비효율적이므로, 나중에 바꿀 것.
         for(int i=0;i<behaviorList.Count;i++)
         {
-            Destroy(behaviorList[i]);
+            //Destroy(behaviorList[i]);
+            behaviorList[i].Recycle();
         }
         behaviorList.Clear();
         OriginFactory.Reclaim(this);
