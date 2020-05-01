@@ -44,8 +44,15 @@ public abstract class SpawnZone : PersistableObject
                 shape.SetColor(spawnConfig.color.RandomInRange, i);
             }
         }
+
+        float angularSpeed = spawnConfig.angularSpeed.RandomValueInRange;
+        if(angularSpeed != 0f) //필요한 경우에만 컴포넌트로 추가
+        {
+            //var rotation = shape.gameObject.AddComponent<RotationShapeBehavior>();
+            var rotation = shape.AddBehavior<RotationShapeBehavior>();
+            rotation.AngularVelocity = Random.onUnitSphere * angularSpeed;
+        }
         
-        shape.AngularVelocity = Random.onUnitSphere * spawnConfig.angularSpeed.RandomValueInRange;
 
         Vector3 direction;
         switch(spawnConfig.movementDirection)
@@ -63,9 +70,15 @@ public abstract class SpawnZone : PersistableObject
                 direction = this.transform.forward;
                 break;
         }
-        
-        shape.Velocity = direction * spawnConfig.speed.RandomValueInRange; //velocity 경향성을 주도록 변경
 
+        float speed = spawnConfig.speed.RandomValueInRange;
+        if(speed != 0f)
+        {
+            //var movement = shape.gameObject.AddComponent<MovementShapeBehavior>();
+            var movement = shape.AddBehavior<MovementShapeBehavior>();
+            movement.Velocity = direction * speed;
+        }
+        
         return shape;
     }
     

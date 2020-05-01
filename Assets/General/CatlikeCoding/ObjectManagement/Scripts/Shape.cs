@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Shape : PersistableObject
 {
@@ -69,10 +70,19 @@ public class Shape : PersistableObject
         
     }
 
-    public Vector3 AngularVelocity { get; set; }
-    public Vector3 Velocity { get; set; }
+    
     //어느 factory에서 생긴 shape인지를 추적. 이 정보를 가지고 있지 않으면, reclaim할 때 다른 factory에서 찾으려 할 수 있음.
     ShapeFactory originFactory;
+    List<ShapeBehavior> behaviorList = new List<ShapeBehavior>(); //shape의 behavior를 업데이트 시키기 위한 리스트를 매뉴얼하게 관리
+
+    //shape에 behavior 추가하는 제네릭 메소드 구현
+    public T AddBehavior<T> () where T : ShapeBehavior
+    {
+        T behavior = this.gameObject.AddComponent<T>();
+        behaviorList.Add(behavior);
+        return behavior;
+    }
+
     public ShapeFactory OriginFactory
     {
         get
@@ -94,6 +104,12 @@ public class Shape : PersistableObject
 
     public void Recycle()
     {
+        //pool에서 재사용될 때 shape behavior가 계속 생성되므로, pool에 반납할 때 component 제거. 당연히 좀 비효율적이므로, 나중에 바꿀 것.
+        for(int i=0;i<behaviorList.Count;i++)
+        {
+            Destroy(behaviorList[i]);
+        }
+        behaviorList.Clear();
         OriginFactory.Reclaim(this);
     }
 
@@ -102,11 +118,13 @@ public class Shape : PersistableObject
         colors = new Color[meshRenderers.Length];
     }
 
-    // void FixedUpdate() //개별적으로 FixedUpdate 호출은 성능에 매우 악영향
     public void GameUpdate()
     {
-        this.transform.Rotate(AngularVelocity * Time.deltaTime);
-        this.transform.localPosition += Velocity * Time.deltaTime;
+        //이제 각 shape의 update는 개별 behavior component의 역할
+        for(int i=0;i<behaviorList.Count;i++)
+        {
+            behaviorList[i].GameUpdate(this);
+        }
     }
 
     public override void Save(GameDataWriter writer)
@@ -117,8 +135,13 @@ public class Shape : PersistableObject
         {
             writer.Write(colors[i]);
         }
-        writer.Write(AngularVelocity);
-        writer.Write(Velocity);
+        //behavior의 개수와 타입, 데이터 저장
+        writer.Write(behaviorList.Count);
+        for(int i=0;i<behaviorList.Count;i++)
+        {
+            writer.Write((int)behaviorList[i].BehaviorType);
+            behaviorList[i].Save(writer);
+        }
     }
 
     public override void Load(GameDataReader reader)
@@ -132,9 +155,34 @@ public class Shape : PersistableObject
         {
             SetColor(reader.Version > 0 ? reader.ReadColor() : Color.white);
         }
-        
-        AngularVelocity = reader.Version >= 4 ? reader.ReadVector3() : Vector3.zero;
-        Velocity = reader.Version >= 4 ? reader.ReadVector3() : Vector3.zero;
+
+        if (reader.Version >= 6)
+        {
+            int behaviorCount = reader.ReadInt();
+            for (int i = 0; i < behaviorCount; i++)
+            {
+                //behavior type을 int로 읽어와 enum conversion 후 더하기
+                AddBehavior((ShapeBehaviorType)reader.ReadInt()).Load(reader);
+            }
+        }
+        else if(reader.Version >= 4) //backward compatibility
+        {
+            AddBehavior<RotationShapeBehavior>().AngularVelocity = reader.ReadVector3();
+            AddBehavior<MovementShapeBehavior>().Velocity = reader.ReadVector3();
+        }
+    }
+
+    ShapeBehavior AddBehavior(ShapeBehaviorType type)
+    {
+        switch(type)
+        {
+            case ShapeBehaviorType.Movement:
+                return this.AddBehavior<MovementShapeBehavior>();
+            case ShapeBehaviorType.Rotation:
+                return this.AddBehavior<RotationShapeBehavior>();
+        }
+        Debug.LogError("Forgot to support " + type);
+        return null;
     }
 
     private void LoadColors(GameDataReader reader)

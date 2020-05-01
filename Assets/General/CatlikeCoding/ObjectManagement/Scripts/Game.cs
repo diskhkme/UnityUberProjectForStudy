@@ -33,7 +33,7 @@ public class Game : PersistableObject
     
     List<Shape> shapes;
 
-    const int saveVersion = 5;
+    const int saveVersion = 6;
 
     private void OnEnable()
     {
