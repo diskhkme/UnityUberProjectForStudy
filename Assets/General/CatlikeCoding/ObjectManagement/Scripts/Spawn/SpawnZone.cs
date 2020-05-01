@@ -19,6 +19,18 @@ public abstract class SpawnZone : PersistableObject
         public FloatRange oscillationAmplitude;
         public FloatRange oscilllationFrequency;
 
+        [System.Serializable]
+        public struct SatelliteConfiguration
+        {
+            [FloatRangeSlider(0.1f, 1f)]
+            public FloatRange relativeScale;
+            public FloatRange orbitRadius;
+            public FloatRange orbitFrequency;
+        }
+
+        public SatelliteConfiguration satellite;
+       
+
         public ColorRangeHSV color;
         public bool uniformColor;
     }
@@ -66,11 +78,14 @@ public abstract class SpawnZone : PersistableObject
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
         Transform t = shape.transform;
         t.localRotation = Random.rotation;
-        t.localScale = focalShape.transform.localScale * 0.5f;
+        t.localScale = focalShape.transform.localScale * spawnConfig.satellite.relativeScale.RandomValueInRange;
         t.localPosition = focalShape.transform.localPosition + Vector3.up;
         shape.AddBehavior<MovementShapeBehavior>().Velocity = Vector3.up;
         SetupColor(shape);
         //return을 해야 game에 가서 update loop를 돌게 되는데, 아직 없음. 확장 필요. Game 에 instance 생성
+        shape.AddBehavior<SatelliteShapeBehavior>().Initialize(shape, focalShape,
+            spawnConfig.satellite.orbitRadius.RandomValueInRange,
+            spawnConfig.satellite.orbitFrequency.RandomValueInRange);
     }
 
     private void SetupColor(Shape shape)
