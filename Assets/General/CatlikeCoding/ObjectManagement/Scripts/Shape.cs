@@ -75,6 +75,7 @@ public class Shape : PersistableObject
     ShapeFactory originFactory;
     List<ShapeBehavior> behaviorList = new List<ShapeBehavior>(); //shape의 behavior를 업데이트 시키기 위한 리스트를 매뉴얼하게 관리
     public float Age { get; private set; } //shape이 생긴 시간을 저장. oscillation의 variation과 그 저장에 필요함
+    public int InstanceId { get; private set; } 
 
     //shape에 behavior 추가하는 제네릭 메소드 구현, 뒤쪽의 new()는 기본 생성자가 있다고 알려주는 것.
     public T AddBehavior<T> () where T : ShapeBehavior, new()
@@ -108,8 +109,9 @@ public class Shape : PersistableObject
     public void Recycle()
     {
         Age = 0f;
+        InstanceId++;
         //pool에서 재사용될 때 shape behavior가 계속 생성되므로, pool에 반납할 때 component 제거. 당연히 좀 비효율적이므로, 나중에 바꿀 것.
-        for(int i=0;i<behaviorList.Count;i++)
+        for (int i=0;i<behaviorList.Count;i++)
         {
             //Destroy(behaviorList[i]);
             behaviorList[i].Recycle();
