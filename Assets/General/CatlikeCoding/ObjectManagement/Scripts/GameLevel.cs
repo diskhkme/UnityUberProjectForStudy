@@ -3,13 +3,20 @@
 //상태를 저장해야하므로 PersistableObject로
 public class GameLevel : PersistableObject
 {
-    //이제는 게임 도중에 일어난 상태까지 저장할 수 있도록, game state를 만드는 것이 필요
     public static GameLevel Current { get; private set; }
 
     [SerializeField] SpawnZone spawnZone;
 
-    //상태를 저장해야 하는 persistable object들을 game level에서 관리
-    [SerializeField] PersistableObject[] persistentObjects; 
+    [SerializeField] PersistableObject[] persistentObjects;
+
+    [SerializeField] int populationLimit;
+    public int PopulationLimit
+    {
+        get
+        {
+            return populationLimit;
+        }
+    }
 
     private void OnEnable()
     {

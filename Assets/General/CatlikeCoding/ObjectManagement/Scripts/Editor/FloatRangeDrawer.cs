@@ -4,8 +4,8 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomPropertyDrawer(typeof(FloatRange))] //어떤 타입에 대한 property drawer인지 알려주어야 함
-public class FloatRangeDrawer : PropertyDrawer
+[CustomPropertyDrawer(typeof(FloatRange)), CustomPropertyDrawer(typeof(IntRange))]
+public class FloatOrIntRangeDrawer : PropertyDrawer
 {
     //OnGUI 오버라이드 해서 구현
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
