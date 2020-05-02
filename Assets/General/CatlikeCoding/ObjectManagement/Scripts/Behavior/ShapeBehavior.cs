@@ -19,7 +19,7 @@ public abstract class ShapeBehavior
     }
 #endif
     public abstract ShapeBehaviorType BehaviorType { get; }
-    public abstract void GameUpdate(Shape shape);
+    public abstract bool GameUpdate(Shape shape); //현재 behavior가 필요한 상태인지 아닌지를 반환
     public abstract void Recycle();
 
     public abstract void Save(GameDataWriter writer);

@@ -5,6 +5,7 @@ public sealed class SatelliteShapeBehavior : ShapeBehavior
     ShapeInstance focalShape;
     float frequency;
     Vector3 cosOffset, sinOffset;
+    Vector3 previousPosition; //focus가 없어지면 움직이던 방향대로 날아가도록 구현하기 위해 추가
 
     public override ShapeBehaviorType BehaviorType
     {
@@ -33,16 +34,20 @@ public sealed class SatelliteShapeBehavior : ShapeBehavior
         shape.AddBehavior<RotationShapeBehavior>().AngularVelocity = -360f * frequency * shape.transform.InverseTransformDirection(orbitAxis);
 
         GameUpdate(shape); //초기 위치를 맞추기 위해 GameUpdate 한번 호출
+        previousPosition = shape.transform.localPosition; //focus가 없어지는 것이 첫 프레임일수도 있고, 이전 데이터가 남아있을 수도 있으므로, 초기화
     }
 
-    public override void GameUpdate(Shape shape)
+    public override bool GameUpdate(Shape shape)
     {
         if(focalShape.IsValid)
         {
             float t = 2f * Mathf.PI * frequency * shape.Age;
+            previousPosition = shape.transform.localPosition;
             shape.transform.localPosition = focalShape.Shape.transform.localPosition + cosOffset * Mathf.Cos(t) + sinOffset * Mathf.Sin(t);
+            return true;
         }
-        
+        shape.AddBehavior<MovementShapeBehavior>().Velocity = (shape.transform.localPosition - previousPosition) / Time.deltaTime;
+        return false; //satellite의 경우 focal shape이 valid일때만 true
     }
 
     public override void Save(GameDataWriter writer) { }

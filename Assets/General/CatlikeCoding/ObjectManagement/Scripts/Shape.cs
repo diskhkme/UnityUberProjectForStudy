@@ -131,7 +131,11 @@ public class Shape : PersistableObject
         //이제 각 shape의 update는 개별 behavior component의 역할
         for(int i=0;i<behaviorList.Count;i++)
         {
-            behaviorList[i].GameUpdate(this);
+            if(!behaviorList[i].GameUpdate(this)) //update가 필요없는 behavior는 반환(satellite, focus가 없는 경우)
+            {
+                behaviorList[i].Recycle();
+                behaviorList.RemoveAt(i--);
+            }
         }
     }
 
