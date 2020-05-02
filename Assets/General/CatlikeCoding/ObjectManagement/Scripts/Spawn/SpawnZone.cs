@@ -31,6 +31,14 @@ public abstract class SpawnZone : PersistableObject
 
         public SatelliteConfiguration satellite;
        
+        [System.Serializable]
+        public struct LifecycleConfiguration
+        {
+            [FloatRangeSlider(0f, 2f)]
+            public FloatRange growingDuration;
+        }
+
+        public LifecycleConfiguration lifecycle;
 
         public ColorRangeHSV color;
         public bool uniformColor;
@@ -69,16 +77,20 @@ public abstract class SpawnZone : PersistableObject
 
         SetupOscillation(shape);
 
+        float growingDuration = spawnConfig.lifecycle.growingDuration.RandomValueInRange;
+
         int satelliteCount = spawnConfig.satellite.amount.RandomValueInRange;
         for(int i=0;i<satelliteCount;i++)
         {
-            CreateSatelliteFor(shape);
+            CreateSatelliteFor(shape,growingDuration);
         }
+
+        SetupLifecycle(shape, growingDuration);
         
     }
 
     //특정 shape에 딸려 생기는 위성 shape 생성
-    void CreateSatelliteFor(Shape focalShape)
+    void CreateSatelliteFor(Shape focalShape, float growingDuration)
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
@@ -92,6 +104,7 @@ public abstract class SpawnZone : PersistableObject
         shape.AddBehavior<SatelliteShapeBehavior>().Initialize(shape, focalShape,
             spawnConfig.satellite.orbitRadius.RandomValueInRange,
             spawnConfig.satellite.orbitFrequency.RandomValueInRange);
+        SetupLifecycle(shape, growingDuration);
     }
 
     private void SetupColor(Shape shape)
@@ -137,4 +150,11 @@ public abstract class SpawnZone : PersistableObject
         }
     }
     
+    void SetupLifecycle (Shape shape, float growingDuration)
+    {
+        if(growingDuration > 0f)
+        {
+            shape.AddBehavior<GrowingShapeBehavior>().Initialize(shape, growingDuration);
+        }
+    }
 }
