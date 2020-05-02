@@ -227,7 +227,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnZone: {fileID: 1835643834}
-  persistentObjects:
+  levelObjects:
   - {fileID: 1835643834}
   populationLimit: 20
 --- !u!4 &1671373174
@@ -449,7 +449,7 @@ GameObject:
   - component: {fileID: 2074321775}
   - component: {fileID: 2074321774}
   - component: {fileID: 2074321773}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: Kill Zone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
