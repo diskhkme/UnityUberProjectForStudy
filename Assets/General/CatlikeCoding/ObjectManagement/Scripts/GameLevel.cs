@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 //상태를 저장해야하므로 PersistableObject로
-public class GameLevel : PersistableObject
+public partial class GameLevel : PersistableObject
 {
     public static GameLevel Current { get; private set; }
 
@@ -18,7 +18,7 @@ public class GameLevel : PersistableObject
             return populationLimit;
         }
     }
-
+    
     private void OnEnable()
     {
         Current = this;
@@ -40,6 +40,8 @@ public class GameLevel : PersistableObject
     {
         spawnZone.SpawnShape();
     }
+
+
 
     public override void Save(GameDataWriter writer)
     {
