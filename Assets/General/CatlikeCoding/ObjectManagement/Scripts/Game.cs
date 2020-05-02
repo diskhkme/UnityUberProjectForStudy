@@ -141,6 +141,7 @@ public class Game : PersistableObject
         {
             shapes[i].GameUpdate();
         }
+        GameLevel.Current.GameUpdate();
         inGameUpdateLoop = false;
 
         creationProgress += Time.deltaTime * CreationSpeed;

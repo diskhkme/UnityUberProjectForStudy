@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public abstract class SpawnZone : PersistableObject
+public abstract class SpawnZone : GameLevelObject
 {
     [System.Serializable]
     public struct SpawnConfiguration
@@ -66,17 +66,16 @@ public abstract class SpawnZone : PersistableObject
     [SerializeField, Range(0f, 50f)] float spawnSpeed;
     float spawnProgress;
 
-    private void FixedUpdate()
+    public override void GameUpdate()
     {
         spawnProgress += Time.deltaTime * spawnSpeed;
-        while(spawnProgress >= 1f)
+        while (spawnProgress >= 1f)
         {
             spawnProgress -= 1f;
             SpawnShape();
         }
     }
-
-
+    
     //이제 shape의 spawn을 game에서 zone의 역할로 가져옴
     public virtual void SpawnShape()
     {
