@@ -173,6 +173,9 @@ MonoBehaviour:
       min: 0
       max: 0
     satellite:
+      amount:
+        min: 0
+        max: 3
       relativeScale:
         min: 0.25
         max: 0.5
@@ -182,6 +185,17 @@ MonoBehaviour:
       orbitFrequency:
         min: 0.25
         max: 0.5
+      uniformLifecycles: 0
+    lifecycle:
+      growingDuration:
+        min: 0
+        max: 2
+      adultDuration:
+        min: 0
+        max: 100
+      dyingDuration:
+        min: 0
+        max: 2
     color:
       hue:
         min: 0
@@ -239,6 +253,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnZone: {fileID: 890927170}
   persistentObjects: []
+  populationLimit: 100
 --- !u!4 &1529926686
 Transform:
   m_ObjectHideFlags: 0

@@ -27,6 +27,7 @@ public abstract class SpawnZone : PersistableObject
             public FloatRange relativeScale;
             public FloatRange orbitRadius;
             public FloatRange orbitFrequency;
+            public bool uniformLifecycles;
         }
 
         public SatelliteConfiguration satellite;
@@ -36,14 +37,17 @@ public abstract class SpawnZone : PersistableObject
         {
             [FloatRangeSlider(0f, 2f)]
             public FloatRange growingDuration;
+            [FloatRangeSlider(0f, 100f)]
+            public FloatRange adultDuration;
             [FloatRangeSlider(0f, 2f)]
             public FloatRange dyingDuration;
 
-            public Vector2 RandomDurations
+            public Vector3 RandomDurations
             {
                 get
                 {
-                    return new Vector2(growingDuration.RandomValueInRange,
+                    return new Vector3(growingDuration.RandomValueInRange,
+                                        adultDuration.RandomValueInRange,
                                         dyingDuration.RandomValueInRange);
                 }
             }
@@ -88,12 +92,13 @@ public abstract class SpawnZone : PersistableObject
 
         SetupOscillation(shape);
 
-        Vector2 lifecycleDuration = spawnConfig.lifecycle.RandomDurations;
+        Vector3 lifecycleDuration = spawnConfig.lifecycle.RandomDurations;
 
         int satelliteCount = spawnConfig.satellite.amount.RandomValueInRange;
         for(int i=0;i<satelliteCount;i++)
         {
-            CreateSatelliteFor(shape, lifecycleDuration);
+            CreateSatelliteFor(shape, 
+                spawnConfig.satellite.uniformLifecycles ? lifecycleDuration : spawnConfig.lifecycle.RandomDurations);
         }
 
         SetupLifecycle(shape, lifecycleDuration);
@@ -101,7 +106,7 @@ public abstract class SpawnZone : PersistableObject
     }
 
     //특정 shape에 딸려 생기는 위성 shape 생성
-    void CreateSatelliteFor(Shape focalShape, Vector2 lifecycleDuration)
+    void CreateSatelliteFor(Shape focalShape, Vector3 lifecycleDuration)
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
@@ -161,15 +166,34 @@ public abstract class SpawnZone : PersistableObject
         }
     }
     
-    void SetupLifecycle (Shape shape, Vector2 durations)
+    void SetupLifecycle (Shape shape, Vector3 durations)
     {
-        if(durations.x > 0f)
+        if (durations.x > 0f) //growing이 있고,
         {
-            shape.AddBehavior<GrowingShapeBehavior>().Initialize(shape, durations.x);
+            if (durations.y > 0f || durations.z > 0f) //adult와 dying 둘 중 하나라도 있으면
+            {
+                shape.AddBehavior<LifecycleShapeBehavior>().Initialize( //1)모두 다 커버하는 lifecycle 추가
+                    shape, durations.x, durations.y, durations.z
+                );
+            }
+            else //아니면 growing만 필요
+            {
+                shape.AddBehavior<GrowingShapeBehavior>().Initialize(
+                    shape, durations.x
+                );
+            }
         }
-        else if(durations.y > 0f)
+        else if (durations.y > 0f)
         {
-            shape.AddBehavior<DyingShapeBehavior>().Initialize(shape, durations.y);
+            shape.AddBehavior<LifecycleShapeBehavior>().Initialize(
+                shape, durations.x, durations.y, durations.z
+            );
+        }
+        else if (durations.z > 0f)
+        {
+            shape.AddBehavior<DyingShapeBehavior>().Initialize(
+                shape, durations.z
+            );
         }
     }
 }
