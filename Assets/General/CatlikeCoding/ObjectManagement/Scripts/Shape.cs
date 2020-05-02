@@ -129,6 +129,11 @@ public class Shape : PersistableObject
         }
     }
 
+    public void Die()
+    {
+        Game.Instance.Kill(this);
+    }
+
     private void Awake()
     {
         colors = new Color[meshRenderers.Length];

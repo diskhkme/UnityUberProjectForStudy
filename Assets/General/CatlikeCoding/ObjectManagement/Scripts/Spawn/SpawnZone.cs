@@ -36,6 +36,17 @@ public abstract class SpawnZone : PersistableObject
         {
             [FloatRangeSlider(0f, 2f)]
             public FloatRange growingDuration;
+            [FloatRangeSlider(0f, 2f)]
+            public FloatRange dyingDuration;
+
+            public Vector2 RandomDurations
+            {
+                get
+                {
+                    return new Vector2(growingDuration.RandomValueInRange,
+                                        dyingDuration.RandomValueInRange);
+                }
+            }
         }
 
         public LifecycleConfiguration lifecycle;
@@ -77,20 +88,20 @@ public abstract class SpawnZone : PersistableObject
 
         SetupOscillation(shape);
 
-        float growingDuration = spawnConfig.lifecycle.growingDuration.RandomValueInRange;
+        Vector2 lifecycleDuration = spawnConfig.lifecycle.RandomDurations;
 
         int satelliteCount = spawnConfig.satellite.amount.RandomValueInRange;
         for(int i=0;i<satelliteCount;i++)
         {
-            CreateSatelliteFor(shape,growingDuration);
+            CreateSatelliteFor(shape, lifecycleDuration);
         }
 
-        SetupLifecycle(shape, growingDuration);
+        SetupLifecycle(shape, lifecycleDuration);
         
     }
 
     //특정 shape에 딸려 생기는 위성 shape 생성
-    void CreateSatelliteFor(Shape focalShape, float growingDuration)
+    void CreateSatelliteFor(Shape focalShape, Vector2 lifecycleDuration)
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
@@ -104,7 +115,7 @@ public abstract class SpawnZone : PersistableObject
         shape.AddBehavior<SatelliteShapeBehavior>().Initialize(shape, focalShape,
             spawnConfig.satellite.orbitRadius.RandomValueInRange,
             spawnConfig.satellite.orbitFrequency.RandomValueInRange);
-        SetupLifecycle(shape, growingDuration);
+        SetupLifecycle(shape, lifecycleDuration);
     }
 
     private void SetupColor(Shape shape)
@@ -150,11 +161,15 @@ public abstract class SpawnZone : PersistableObject
         }
     }
     
-    void SetupLifecycle (Shape shape, float growingDuration)
+    void SetupLifecycle (Shape shape, Vector2 durations)
     {
-        if(growingDuration > 0f)
+        if(durations.x > 0f)
         {
-            shape.AddBehavior<GrowingShapeBehavior>().Initialize(shape, growingDuration);
+            shape.AddBehavior<GrowingShapeBehavior>().Initialize(shape, durations.x);
+        }
+        else if(durations.y > 0f)
+        {
+            shape.AddBehavior<DyingShapeBehavior>().Initialize(shape, durations.y);
         }
     }
 }

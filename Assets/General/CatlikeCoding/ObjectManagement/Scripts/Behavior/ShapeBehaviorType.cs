@@ -4,7 +4,8 @@
     Rotation,
     Oscillation,
     Satellite,
-    Growing
+    Growing,
+    Dying
 }
 
 //shape에서 하던 type의 정의를 이리로 가져옴
@@ -24,6 +25,8 @@ public static class ShapeBehaviorTypeMethods
                 return ShapeBehaviorPool<SatelliteShapeBehavior>.Get();
             case ShapeBehaviorType.Growing:
                 return ShapeBehaviorPool<GrowingShapeBehavior>.Get();
+            case ShapeBehaviorType.Dying:
+                return ShapeBehaviorPool<DyingShapeBehavior>.Get();
         }
         UnityEngine.Debug.Log("Forgot to support" + type);
         return null;

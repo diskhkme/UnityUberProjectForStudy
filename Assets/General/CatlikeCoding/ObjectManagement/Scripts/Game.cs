@@ -26,12 +26,14 @@ public class Game : PersistableObject
     [SerializeField] Slider destructionSpeedSlider;
     Random.State mainRandomState;
     [SerializeField] bool reseedOnLoad; //게임을 시작할때 seed를 새로 할당할 것인지, 재사용할 것인지를 optional로 둠
-    
+
+    bool inGameUpdateLoop;
 
     [SerializeField] int levelCount;
     int loadLevelBuildIndex;
-    
+
     List<Shape> shapes;
+    List<ShapeInstance> killList; //중복 kill을 방지하기 위해 isValid()를 갖고있는 shape instance를 활용
 
     const int saveVersion = 6;
 
@@ -53,6 +55,7 @@ public class Game : PersistableObject
         mainRandomState = Random.state;
 
         shapes = new List<Shape>();
+        killList = new List<ShapeInstance>();
 
         if(Application.isEditor)
         {
@@ -129,8 +132,9 @@ public class Game : PersistableObject
 
     private void FixedUpdate()
     {
+        inGameUpdateLoop = true;
         // update 해야 할 object들이 fully reference되어 있을때는 할 만한 작업
-        for(int i=0;i<shapes.Count;i++)
+        for (int i=0;i<shapes.Count;i++)
         {
             shapes[i].GameUpdate();
         }
@@ -156,6 +160,21 @@ public class Game : PersistableObject
             {
                 DestroyShape();
             }
+        }
+        inGameUpdateLoop = false;
+
+        //미뤄놓았던 kill의 처리
+        if(killList.Count > 0)
+        {
+            for(int i=0;i<killList.Count;i++)
+            {
+                if(killList[i].IsValid)
+                {
+                    KillImmediately(killList[i].Shape);
+                }
+                
+            }
+            killList.Clear();
         }
     }
 
@@ -187,15 +206,33 @@ public class Game : PersistableObject
     {
         if(shapes.Count>0)
         {
-            int index = Random.Range(0, shapes.Count);
-            shapes[index].Recycle();
-
-            int lastIndex = shapes.Count - 1;
-            shapes[lastIndex].SaveIndex = index;
-            shapes[index] = shapes[lastIndex];
-            shapes.RemoveAt(lastIndex);
+            Shape shape = shapes[Random.Range(0, shapes.Count)];
+            KillImmediately(shape);
         }
         
+    }
+
+    public void Kill(Shape shape)
+    {
+        if (inGameUpdateLoop)
+        {
+            killList.Add(shape); //update도중에 kill이 일어나면 순서가 바뀌므로, kill 할것은 따로 list에 보관했다가 나중에 처리
+        }
+        else
+        {
+            KillImmediately(shape);
+        }
+        
+    }
+
+    private void KillImmediately(Shape shape)
+    {
+        int index = shape.SaveIndex;
+        shape.Recycle();
+        int lastIndex = shapes.Count - 1;
+        shapes[lastIndex].SaveIndex = index;
+        shapes[index] = shapes[lastIndex];
+        shapes.RemoveAt(lastIndex);
     }
 
     public override void Save(GameDataWriter writer)
