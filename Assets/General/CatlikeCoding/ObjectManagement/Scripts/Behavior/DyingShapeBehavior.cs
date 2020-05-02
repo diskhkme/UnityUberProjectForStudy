@@ -18,6 +18,7 @@ public sealed class DyingShapeBehavior : ShapeBehavior
         originalScale = shape.transform.localScale;
         this.duration = duration;
         dyingAge = shape.Age; //죽기 시작하는 age
+        shape.MarkAsDying(); //죽기 시작하는 시점은, 이 컴포넌트가 초기화되는 시점.
     }
 
     public override bool GameUpdate(Shape shape)

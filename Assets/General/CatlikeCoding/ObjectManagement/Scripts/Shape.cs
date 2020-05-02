@@ -134,6 +134,19 @@ public class Shape : PersistableObject
         Game.Instance.Kill(this);
     }
 
+    public void MarkAsDying()
+    {
+        Game.Instance.MarkAsDying(this);
+    }
+
+    public bool IsMarkedAsDying
+    {
+        get
+        {
+            return Game.Instance.IsMarkedAsDying(this);
+        }
+    }
+
     private void Awake()
     {
         colors = new Color[meshRenderers.Length];

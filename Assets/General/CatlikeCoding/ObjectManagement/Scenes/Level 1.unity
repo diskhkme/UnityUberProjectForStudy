@@ -153,6 +153,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnZone: {fileID: 1835643834}
   persistentObjects: []
+  populationLimit: 20
 --- !u!4 &1671373174
 Transform:
   m_ObjectHideFlags: 0
@@ -210,6 +211,37 @@ MonoBehaviour:
     scale:
       min: 1
       max: 2
+    oscillationDirection: 0
+    oscillationAmplitude:
+      min: 0
+      max: 0
+    oscilllationFrequency:
+      min: 0
+      max: 0
+    satellite:
+      amount:
+        min: 0
+        max: 0
+      relativeScale:
+        min: 0.1
+        max: 0.1
+      orbitRadius:
+        min: 0
+        max: 0
+      orbitFrequency:
+        min: 0
+        max: 0
+      uniformLifecycles: 0
+    lifecycle:
+      growingDuration:
+        min: 0
+        max: 0
+      adultDuration:
+        min: 0
+        max: 0
+      dyingDuration:
+        min: 0
+        max: 0
     color:
       hue:
         min: 0

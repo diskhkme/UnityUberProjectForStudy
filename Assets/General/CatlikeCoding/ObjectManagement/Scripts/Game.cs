@@ -33,7 +33,9 @@ public class Game : PersistableObject
     int loadLevelBuildIndex;
 
     List<Shape> shapes;
-    List<ShapeInstance> killList; //중복 kill을 방지하기 위해 isValid()를 갖고있는 shape instance를 활용
+    List<ShapeInstance> killList, markAsDyingList;
+    int dyingShapeCount; //죽어가고있는(?) shape을 앞에, 나머지 shape을 뒤에 두려 함
+    [SerializeField] float destroyDuration;
 
     const int saveVersion = 6;
 
@@ -56,8 +58,9 @@ public class Game : PersistableObject
 
         shapes = new List<Shape>();
         killList = new List<ShapeInstance>();
+        markAsDyingList = new List<ShapeInstance>();
 
-        if(Application.isEditor)
+        if (Application.isEditor)
         {
             for(int i=0;i<SceneManager.sceneCount;i++)
             {
@@ -138,6 +141,7 @@ public class Game : PersistableObject
         {
             shapes[i].GameUpdate();
         }
+        inGameUpdateLoop = false;
 
         creationProgress += Time.deltaTime * CreationSpeed;
         while (creationProgress >= 1f)
@@ -156,13 +160,12 @@ public class Game : PersistableObject
         int limit = GameLevel.Current.PopulationLimit;
         if(limit > 0)
         {
-            while(shapes.Count> limit)
+            while(shapes.Count - dyingShapeCount > limit) //죽는 중인 shape들은 limit count에서 제외
             {
                 DestroyShape();
             }
         }
-        inGameUpdateLoop = false;
-
+        
         //미뤄놓았던 kill의 처리
         if(killList.Count > 0)
         {
@@ -176,10 +179,23 @@ public class Game : PersistableObject
             }
             killList.Clear();
         }
+
+        if(markAsDyingList.Count > 0)
+        {
+            for(int i=0;i<markAsDyingList.Count;i++)
+            {
+                if(markAsDyingList[i].IsValid)
+                {
+                    MarkAsDyingImmediately(markAsDyingList[i].Shape);
+                }
+            }
+            markAsDyingList.Clear();
+        }
     }
 
     private void BeginNewGame()
     {
+        
         Random.state = mainRandomState;
         int seed = Random.Range(0, int.MaxValue) ^ (int)Time.unscaledDeltaTime; //bitwise or과 time을 사용해 랜덤 강화
         mainRandomState = Random.state;
@@ -194,6 +210,8 @@ public class Game : PersistableObject
             shapes[i].Recycle();
         }
         shapes.Clear();
+
+        dyingShapeCount = 0;
     }
 
     public void AddShape(Shape shape)
@@ -204,10 +222,17 @@ public class Game : PersistableObject
 
     void DestroyShape()
     {
-        if(shapes.Count>0)
+        if(shapes.Count - dyingShapeCount > 0)
         {
-            Shape shape = shapes[Random.Range(0, shapes.Count)];
-            KillImmediately(shape);
+            Shape shape = shapes[Random.Range(dyingShapeCount, shapes.Count)];
+            if(destroyDuration <= 0f)
+            {
+                KillImmediately(shape);
+            }
+            else
+            {
+                shape.AddBehavior<DyingShapeBehavior>().Initialize(shape, destroyDuration);
+            }
         }
         
     }
@@ -228,11 +253,51 @@ public class Game : PersistableObject
     private void KillImmediately(Shape shape)
     {
         int index = shape.SaveIndex;
+        if(index < dyingShapeCount && index < --dyingShapeCount)
+        {
+            shapes[dyingShapeCount].SaveIndex = index;
+            shapes[index] = shapes[dyingShapeCount];
+            index = dyingShapeCount;
+        }
+
         shape.Recycle();
         int lastIndex = shapes.Count - 1;
-        shapes[lastIndex].SaveIndex = index;
-        shapes[index] = shapes[lastIndex];
+        if(index < lastIndex)
+        {
+            shapes[lastIndex].SaveIndex = index;
+            shapes[index] = shapes[lastIndex];
+        }
         shapes.RemoveAt(lastIndex);
+    }
+
+    void MarkAsDyingImmediately(Shape shape)
+    {
+        int index = shape.SaveIndex;
+        if(index < dyingShapeCount) //이미 죽어가는 중이라면, 추가적인 작업 안함
+        {
+            return;
+        }
+        shapes[dyingShapeCount].SaveIndex = index;
+        shapes[index] = shapes[dyingShapeCount];
+        shape.SaveIndex = dyingShapeCount;
+        shapes[dyingShapeCount++] = shape;
+    }
+
+    public void MarkAsDying(Shape shape)
+    {
+        if(inGameUpdateLoop)
+        {
+            markAsDyingList.Add(shape);
+        }
+        else
+        {
+            MarkAsDyingImmediately(shape);
+        }
+    }
+
+    public bool IsMarkedAsDying(Shape shape)
+    {
+        return shape.SaveIndex < dyingShapeCount;
     }
 
     public override void Save(GameDataWriter writer)
