@@ -37,7 +37,7 @@ public class Game : PersistableObject
     int dyingShapeCount; //죽어가고있는(?) shape을 앞에, 나머지 shape을 뒤에 두려 함
     [SerializeField] float destroyDuration;
 
-    const int saveVersion = 6;
+    const int saveVersion = 7;
 
     private void OnEnable()
     {

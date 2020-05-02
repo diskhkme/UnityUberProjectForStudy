@@ -60,12 +60,16 @@ public class CompositeSpawnZone : SpawnZone
 
     public override void Save(GameDataWriter writer)
     {
-        //추가적으로 저장할 game state data
+        base.Save(writer); //composite도 spawnzone의 progress 저장 해야 함
         writer.Write(nextSequentialIndex);
     }
 
     public override void Load(GameDataReader reader)
     {
+        if(reader.Version >= 7)
+        {
+            base.Load(reader);
+        }
         nextSequentialIndex = reader.ReadInt();
     }
 

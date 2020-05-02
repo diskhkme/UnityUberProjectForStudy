@@ -152,7 +152,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnZone: {fileID: 1835643834}
-  persistentObjects: []
+  persistentObjects:
+  - {fileID: 1835643834}
   populationLimit: 20
 --- !u!4 &1671373174
 Transform:
@@ -253,6 +254,7 @@ MonoBehaviour:
         min: 0
         max: 1
     uniformColor: 0
+  spawnSpeed: 20
   surfaceOnly: 1
 --- !u!4 &1835643835
 Transform:

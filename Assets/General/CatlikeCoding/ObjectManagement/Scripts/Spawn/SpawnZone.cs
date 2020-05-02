@@ -62,7 +62,20 @@ public abstract class SpawnZone : PersistableObject
     [SerializeField] SpawnConfiguration spawnConfig;
 
     public abstract Vector3 SpawnPoint { get; }
-    
+
+    [SerializeField, Range(0f, 50f)] float spawnSpeed;
+    float spawnProgress;
+
+    private void FixedUpdate()
+    {
+        spawnProgress += Time.deltaTime * spawnSpeed;
+        while(spawnProgress >= 1f)
+        {
+            spawnProgress -= 1f;
+            SpawnShape();
+        }
+    }
+
 
     //이제 shape의 spawn을 game에서 zone의 역할로 가져옴
     public virtual void SpawnShape()
@@ -195,5 +208,15 @@ public abstract class SpawnZone : PersistableObject
                 shape, durations.z
             );
         }
+    }
+
+    public override void Save(GameDataWriter writer)
+    {
+        writer.Write(spawnProgress);
+    }
+
+    public override void Load(GameDataReader reader)
+    {
+        spawnProgress = reader.ReadFloat();
     }
 }
