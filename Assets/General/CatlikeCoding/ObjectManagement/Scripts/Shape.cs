@@ -76,6 +76,7 @@ public class Shape : PersistableObject
     List<ShapeBehavior> behaviorList = new List<ShapeBehavior>(); //shape의 behavior를 업데이트 시키기 위한 리스트를 매뉴얼하게 관리
     public float Age { get; private set; } //shape이 생긴 시간을 저장. oscillation의 variation과 그 저장에 필요함
     public int InstanceId { get; private set; } 
+    public int SaveIndex { get; set; }
 
     //shape에 behavior 추가하는 제네릭 메소드 구현, 뒤쪽의 new()는 기본 생성자가 있다고 알려주는 것.
     public T AddBehavior<T> () where T : ShapeBehavior, new()
@@ -118,6 +119,14 @@ public class Shape : PersistableObject
         }
         behaviorList.Clear();
         OriginFactory.Reclaim(this);
+    }
+
+    public void ResolveShapeInstances()
+    {
+        for(int i=0;i<behaviorList.Count;i++)
+        {
+            behaviorList[i].ResolveShapeInstances();
+        }
     }
 
     private void Awake()
@@ -184,6 +193,8 @@ public class Shape : PersistableObject
             AddBehavior<RotationShapeBehavior>().AngularVelocity = reader.ReadVector3();
             AddBehavior<MovementShapeBehavior>().Velocity = reader.ReadVector3();
         }
+
+        
     }
 
     private void LoadColors(GameDataReader reader)

@@ -50,9 +50,28 @@ public sealed class SatelliteShapeBehavior : ShapeBehavior
         return false; //satellite의 경우 focal shape이 valid일때만 true
     }
 
-    public override void Save(GameDataWriter writer) { }
+    public override void ResolveShapeInstances()
+    {
+        focalShape.Resolve();
+    }
 
-    public override void Load(GameDataReader reader) { }
+    public override void Save(GameDataWriter writer)
+    {
+        writer.Write(focalShape); //focal shape의 saveindex를 저장
+        writer.Write(frequency);
+        writer.Write(cosOffset);
+        writer.Write(sinOffset);
+        writer.Write(previousPosition);
+    }
+
+    public override void Load(GameDataReader reader)
+    {
+        focalShape = reader.ReadShapeInstance();
+        frequency = reader.ReadFloat();
+        cosOffset = reader.ReadVector3();
+        sinOffset = reader.ReadVector3();
+        previousPosition = reader.ReadVector3();
+    }
 
     public override void Recycle()
     {

@@ -170,6 +170,7 @@ public class Game : PersistableObject
 
     public void AddShape(Shape shape)
     {
+        shape.SaveIndex = shapes.Count;
         shapes.Add(shape);
     }
 
@@ -181,6 +182,7 @@ public class Game : PersistableObject
             shapes[index].Recycle();
 
             int lastIndex = shapes.Count - 1;
+            shapes[lastIndex].SaveIndex = index;
             shapes[index] = shapes[lastIndex];
             shapes.RemoveAt(lastIndex);
         }
@@ -250,5 +252,15 @@ public class Game : PersistableObject
             Shape instance = shapeFactories[factoryId].Get(shapeId, materialId);
             instance.Load(reader);
         }
+
+        for (int i = 0; i < shapes.Count; i++)
+        {
+            shapes[i].ResolveShapeInstances();
+        }
+    }
+
+    public Shape GetShape(int index)
+    {
+        return shapes[index];
     }
 }

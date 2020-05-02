@@ -21,9 +21,12 @@ public abstract class ShapeBehavior
     public abstract ShapeBehaviorType BehaviorType { get; }
     public abstract bool GameUpdate(Shape shape); //현재 behavior가 필요한 상태인지 아닌지를 반환
     public abstract void Recycle();
+    public virtual void ResolveShapeInstances() //satellite만 구현 필요
+    { }
 
     public abstract void Save(GameDataWriter writer);
     public abstract void Load(GameDataReader reader);
+    
 
 
 

@@ -49,4 +49,9 @@ public class GameDataWriter
         //JSON serialization을 사용해 저장
         writer.Write(JsonUtility.ToJson(value));
     }
+
+    public void Write(ShapeInstance value)
+    {
+        writer.Write(value.IsValid ? value.Shape.SaveIndex : -1); //invalid인 shape은 음수 index로
+    }
 }

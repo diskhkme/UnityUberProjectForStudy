@@ -57,4 +57,9 @@ public class GameDataReader
         return color;
 
     }
+
+    public ShapeInstance ReadShapeInstance()
+    {
+        return new ShapeInstance(reader.ReadInt32()); //save index 읽은 후 생성자를 통해 Game의 shapelist에 질의 후 받아와서 바로 return
+    }
 }

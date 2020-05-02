@@ -3,19 +3,36 @@ public struct ShapeInstance
 {
     public Shape Shape { get; private set; }
 
-    int instanceId;
+    //satellite 또는 focus shape중 어떤것이 먼저 로딩될지 모르므로 둘다 로딩될때까지 postpone 필요
+    int instanceIdOrSaveIndex;
 
     public ShapeInstance(Shape shape)
     {
         Shape = shape;
-        instanceId = shape.InstanceId;
+        instanceIdOrSaveIndex = shape.InstanceId;
+    }
+
+    public ShapeInstance(int saveIndex)
+    {
+        Shape = null;
+        instanceIdOrSaveIndex = saveIndex;
+    }
+
+    public void Resolve()
+    {
+        if(instanceIdOrSaveIndex >= 0)
+        {
+            Shape = Game.Instance.GetShape(instanceIdOrSaveIndex);
+            instanceIdOrSaveIndex = Shape.InstanceId;
+        }
+        
     }
 
     public bool IsValid
     {
         get
         {
-            return Shape && instanceId == Shape.InstanceId;
+            return Shape && instanceIdOrSaveIndex == Shape.InstanceId;
         }
     }
 
