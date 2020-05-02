@@ -82,6 +82,7 @@ public abstract class SpawnZone : PersistableObject
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
+        shape.gameObject.layer = gameObject.layer;  //특정 레이어의 존에서 생성된 shape은 그 레이어를 가짐. 다른 레이어는 충돌검사 하지 않도록 editor에서 설정함
         Transform t = shape.transform;
         t.localPosition = SpawnPoint;
         t.localRotation = Random.rotation;
@@ -123,6 +124,7 @@ public abstract class SpawnZone : PersistableObject
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
+        shape.gameObject.layer = gameObject.layer;
         Transform t = shape.transform;
         t.localRotation = Random.rotation;
         t.localScale = focalShape.transform.localScale * spawnConfig.satellite.relativeScale.RandomValueInRange;
