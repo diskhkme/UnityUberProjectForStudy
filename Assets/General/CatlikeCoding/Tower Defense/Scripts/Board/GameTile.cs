@@ -1,5 +1,10 @@
 ﻿using UnityEngine;
 
+public enum GameTileContentType
+{
+    Empty, Destination
+}
+
 public class GameTile : MonoBehaviour
 {
     static Quaternion northRotation = Quaternion.Euler(90f, 0f, 0f),
