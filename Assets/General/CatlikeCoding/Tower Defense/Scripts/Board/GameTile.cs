@@ -19,10 +19,25 @@ public class GameTile : MonoBehaviour
     GameTile north, east, south, west; //각 tile은 주변 타일 ref 가지고 있음
     GameTile nextOnPath; //갈 수 있는 다음 tile ref
     int distance; //목적지까지 남은 거리
-
-
-    public bool HasPath => distance != int.MaxValue; //property getter
     
+    public bool HasPath => distance != int.MaxValue; //property getter
+
+    GameTileContent content;
+    public GameTileContent Content
+    {
+        get => content;
+        set
+        {
+            Debug.Assert(value != null, "Null assigned to content!");
+            if(content != null)
+            {
+                content.Recycle();
+            }
+            content = value;
+            content.transform.localPosition = transform.localPosition;
+        }
+    }
+
     public static void MakeEastWestNeighbor(GameTile east, GameTile west) //특정 tile이 주체가 되는 method가 아니므로 static으로 만드는 것이 명확(ex, vector3.dot / distance)
     {
         Debug.Assert(west.east == null && east.west == null, "Redefine neighbors!"); //한번 정하면 바뀔 수 없도록 

@@ -6,9 +6,11 @@ public class DefenseGame : MonoBehaviour
     [SerializeField] GameBoard board = default;
     [SerializeField] GameTileContentFactory tileContentFactory = default;
 
+    Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
+
     private void Awake()
     {
-        board.Initialize(boardSize);
+        board.Initialize(boardSize,tileContentFactory);
     }
 
     private void OnValidate()
@@ -19,4 +21,20 @@ public class DefenseGame : MonoBehaviour
             boardSize.y = 2;
     }
 
+    private void Update()
+    {
+        if(Input.GetMouseButtonDown(0))
+        {
+            HandleTouch();
+        }
+    }
+
+    void HandleTouch()
+    {
+        GameTile tile = board.GetTile(TouchRay);
+        if(tile != null)
+        {
+            board.ToggleDestination(tile);
+        }
+    }
 }

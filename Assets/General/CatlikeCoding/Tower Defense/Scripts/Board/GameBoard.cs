@@ -7,13 +7,14 @@ public class GameBoard : MonoBehaviour
     [SerializeField] GameObject tilePrefab = default;
     Vector2Int size;
     GameTile[] tiles;
-
     //path finding하면서 담을 정보
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
+    GameTileContentFactory contentFactory;
 
-    public void Initialize(Vector2Int size)
+    public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
         this.size = size;
+        this.contentFactory = contentFactory;
         ground.localScale = new Vector3(size.x, size.y, 1f);
         tiles = new GameTile[size.x * size.y];
 
@@ -36,22 +37,34 @@ public class GameBoard : MonoBehaviour
                 {
                     tile.IsAlternative = !tile.IsAlternative;
                 }
+                tile.Content = contentFactory.Get(GameTileContentType.Empty); //초기에 타일들을 empty로 채움
             }
         }
 
-        FindPaths();
+        ToggleDestination(tiles[tiles.Length / 2]);
     }
 
-    void FindPaths()
+    bool FindPaths()
     {
         foreach(GameTile tile in tiles)
         {
-            tile.ClearPath();
+            if(tile.Content.Type == GameTileContentType.Destination)
+            {
+                tile.BecomeDestination();
+                searchFrontier.Enqueue(tile); //destination으로 지정된 타일을 enqueue
+            }
+            else
+            {
+                tile.ClearPath();
+            }
         }
-        tiles[tiles.Length/2].BecomeDestination(); //정가운데 타일을 목적지로
-        searchFrontier.Enqueue(tiles[tiles.Length/2]);
-        
-        while(searchFrontier.Count>0)
+
+        if (searchFrontier.Count == 0) //목적지 타일이 없을 때
+        {
+            return false;
+        }
+
+        while (searchFrontier.Count>0)
         {
             GameTile tile = searchFrontier.Dequeue(); //queue 타일 하나 제거
             if(tile != null)
@@ -78,6 +91,43 @@ public class GameBoard : MonoBehaviour
         foreach(GameTile tile in tiles)
         {
             tile.ShowPath();
+        }
+
+        return true;
+    }
+
+    //ray casting을 통한 타일 셀렉션 기능
+    public GameTile GetTile(Ray ray)
+    {
+        if(Physics.Raycast(ray, out RaycastHit hit))
+        {
+            int x = (int)(hit.point.x + size.x * 0.5f); //hit 위치를 보드의 타일 위치로 변환
+            int y = (int)(hit.point.z + size.y * 0.5f); //hit 위치를 보드의 타일 위치로 변환
+            if(x>=0&&x<size.x&&y>0&&y<size.y)
+            {
+                return tiles[x + y * size.x];
+            }
+            
+        }
+        return null;
+    }
+
+    public void ToggleDestination(GameTile tile)
+    {
+        //목적지 타일이 클릭되면, empty로 바꾸고 path 갱신
+        if(tile.Content.Type == GameTileContentType.Destination)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            if(!FindPaths()) //empty로 바꾸어 목적지가 없어질 경우의 처리. 이미 findpath에서 bool return 하도록 수정 함
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Destination);
+                FindPaths();
+            }
+        }
+        else //empty 타일이 클릭되면, 목적지로 바꾸고 path 갱신
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Destination);
+            FindPaths();
         }
     }
 }
