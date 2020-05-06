@@ -5,11 +5,55 @@ public class GameBoard : MonoBehaviour
 {
     [SerializeField] Transform ground = default;
     [SerializeField] GameObject tilePrefab = default;
+    [SerializeField] Texture2D gridTexture = default;
+
     Vector2Int size;
     GameTile[] tiles;
     //path finding하면서 담을 정보
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
     GameTileContentFactory contentFactory;
+    bool showPaths,showGrid;
+    public bool ShowPaths
+    {
+        get => showPaths;
+        set
+        {
+            showPaths = value;
+            if(showPaths)
+            {
+                foreach(GameTile tile in tiles)
+                {
+                    tile.ShowPath();
+                }
+            }
+            else
+            {
+                foreach(GameTile tile in tiles)
+                {
+                    tile.HidePath();
+                }
+            }
+        }
+    }
+
+    public bool ShowGrid
+    {
+        get => showGrid;
+        set
+        {
+            showGrid = value;
+            Material m = ground.GetComponent<MeshRenderer>().material;
+            if(showGrid)
+            {
+                m.mainTexture = gridTexture;
+                m.SetTextureScale("_MainTex", size);
+            }
+            else
+            {
+                m.mainTexture = null;
+            }
+        }
+    }
 
     public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
@@ -90,8 +134,20 @@ public class GameBoard : MonoBehaviour
 
         foreach(GameTile tile in tiles)
         {
-            tile.ShowPath();
+            if(!tile.HasPath)
+            {
+                return false;
+            }
         }
+
+        if(showPaths)
+        {
+            foreach (GameTile tile in tiles)
+            {
+                tile.ShowPath();
+            }
+        }
+        
 
         return true;
     }
@@ -124,10 +180,28 @@ public class GameBoard : MonoBehaviour
                 FindPaths();
             }
         }
-        else //empty 타일이 클릭되면, 목적지로 바꾸고 path 갱신
+        else if(tile.Content.Type == GameTileContentType.Empty)
         {
             tile.Content = contentFactory.Get(GameTileContentType.Destination);
             FindPaths();
+        }
+    }
+
+    public void ToggleWall(GameTile tile)
+    {
+        if(tile.Content.Type == GameTileContentType.Wall)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            FindPaths();
+        }
+        else if(tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Wall);
+            if(!FindPaths())
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                FindPaths();
+            }
         }
     }
 }

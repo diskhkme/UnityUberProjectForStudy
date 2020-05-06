@@ -265,7 +265,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 20
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -278,7 +278,7 @@ Camera:
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
-  m_AllowMSAA: 1
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
@@ -330,6 +330,7 @@ MonoBehaviour:
   ground: {fileID: 424506255}
   tilePrefab: {fileID: 4285993668018525032, guid: e7298b4f6bf5e2e4e90c11f978097c39,
     type: 3}
+  gridTexture: {fileID: 2800000, guid: e0bfa93968dac0548b6161cfe2ceb803, type: 3}
 --- !u!4 &545903076
 Transform:
   m_ObjectHideFlags: 0
@@ -385,7 +386,7 @@ Light:
     m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
-    m_NormalBias: 0.4
+    m_NormalBias: 0
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
       e00: 1

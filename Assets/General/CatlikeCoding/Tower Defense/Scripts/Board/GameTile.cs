@@ -2,15 +2,15 @@
 
 public enum GameTileContentType
 {
-    Empty, Destination
+    Empty, Destination, Wall
 }
 
 public class GameTile : MonoBehaviour
 {
-    static Quaternion northRotation = Quaternion.Euler(90f, 0f, 0f),
-                    eastRotation = Quaternion.Euler(90f, 90f, 0f),
-                    southRotation = Quaternion.Euler(90f, 180f, 0f),
-                    westRotation = Quaternion.Euler(90f, 270f, 0f);
+    static Quaternion northRotation = Quaternion.Euler( 0f,    0f,     0f),
+                    eastRotation = Quaternion.Euler(    0f,    90f,    0f),
+                    southRotation = Quaternion.Euler(   0f,    180f,   0f),
+                    westRotation = Quaternion.Euler(    0f,    270f,   0f);
 
 
     [SerializeField] Transform arrow = default;
@@ -74,7 +74,7 @@ public class GameTile : MonoBehaviour
         }
         neighbor.distance = distance + 1;
         neighbor.nextOnPath = this;
-        return neighbor;
+        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null; //wall이면 null 반환
     }
 
     //각 방향으로의 growpath public methods
@@ -95,5 +95,10 @@ public class GameTile : MonoBehaviour
                             nextOnPath == east ? eastRotation :
                             nextOnPath == south ? southRotation :
                             westRotation;
+    }
+
+    public void HidePath()
+    {
+        arrow.gameObject.SetActive(false);
     }
 }

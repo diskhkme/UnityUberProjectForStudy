@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class DefenseGame : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class DefenseGame : MonoBehaviour
     private void Awake()
     {
         board.Initialize(boardSize,tileContentFactory);
+        board.ShowGrid = true;
     }
 
     private void OnValidate()
@@ -23,9 +25,32 @@ public class DefenseGame : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(1))
         {
             HandleTouch();
+        }
+        else if(Input.GetMouseButtonDown(0))
+        {
+            HandleAlternativeTouch();
+        }
+
+        if(Input.GetKeyDown(KeyCode.V))
+        {
+            board.ShowPaths = !board.ShowPaths;
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            board.ShowGrid = !board.ShowGrid;
+        }
+    }
+
+    private void HandleAlternativeTouch()
+    {
+        GameTile tile = board.GetTile(TouchRay);
+        if(tile != null)
+        {
+            board.ToggleWall(tile);
         }
     }
 

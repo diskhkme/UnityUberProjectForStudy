@@ -8,6 +8,7 @@ public class GameTileContentFactory : ScriptableObject
     Scene contentScene;
     [SerializeField] GameTileContent destinationPrefab = default;
     [SerializeField] GameTileContent emptyPrefab = default;
+    [SerializeField] GameTileContent wallPrefab = default;
 
     public void Reclaim(GameTileContent content)
     {
@@ -30,6 +31,7 @@ public class GameTileContentFactory : ScriptableObject
         {
             case GameTileContentType.Destination: return Get(destinationPrefab);
             case GameTileContentType.Empty: return Get(emptyPrefab);
+            case GameTileContentType.Wall: return Get(wallPrefab);
         }
         Debug.Assert(false, "Unsupported type: " + type);
         return null;
