@@ -11,6 +11,10 @@ public class GameBoard : MonoBehaviour
     GameTile[] tiles;
     //path finding하면서 담을 정보
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
+    //enemy spawn point들을 담은 list
+    List<GameTile> spawnPoints = new List<GameTile>();
+    public int spawnPointCount => spawnPoints.Count;
+
     GameTileContentFactory contentFactory;
     bool showPaths,showGrid;
     public bool ShowPaths
@@ -86,6 +90,7 @@ public class GameBoard : MonoBehaviour
         }
 
         ToggleDestination(tiles[tiles.Length / 2]);
+        ToggleSpawnPoint(tiles[0]);
     }
 
     bool FindPaths()
@@ -203,5 +208,28 @@ public class GameBoard : MonoBehaviour
                 FindPaths();
             }
         }
+    }
+
+    //지금까지처럼, 클릭으로 spawn point 할당 기능 추가. 단, spawn point는 path에 영향을 주지 않음
+    public void ToggleSpawnPoint(GameTile tile)
+    {
+        if(tile.Content.Type == GameTileContentType.SpawnPoint)
+        {
+            if(spawnPoints.Count > 1) //적어도 하나의 spawn point는 남아 있도록 함
+            {
+                spawnPoints.Remove(tile);
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            }
+        }
+        else if(tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.SpawnPoint);
+            spawnPoints.Add(tile);
+        }
+    }
+
+    public GameTile GetSpawnPoint(int index)
+    {
+        return spawnPoints[index];
     }
 }

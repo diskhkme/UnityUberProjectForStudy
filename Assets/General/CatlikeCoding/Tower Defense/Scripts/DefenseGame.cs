@@ -27,11 +27,12 @@ public class DefenseGame : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(1))
         {
-            HandleTouch();
+            HandleAlternativeTouch();
+            
         }
         else if(Input.GetMouseButtonDown(0))
         {
-            HandleAlternativeTouch();
+            HandleTouch();
         }
 
         if(Input.GetKeyDown(KeyCode.V))
@@ -50,7 +51,14 @@ public class DefenseGame : MonoBehaviour
         GameTile tile = board.GetTile(TouchRay);
         if(tile != null)
         {
-            board.ToggleWall(tile);
+            if(Input.GetKey(KeyCode.LeftShift))
+            {
+                board.ToggleDestination(tile);
+            }
+            else
+            {
+                board.ToggleSpawnPoint(tile);
+            }
         }
     }
 
@@ -59,7 +67,7 @@ public class DefenseGame : MonoBehaviour
         GameTile tile = board.GetTile(TouchRay);
         if(tile != null)
         {
-            board.ToggleDestination(tile);
+            board.ToggleWall(tile);
         }
     }
 }
