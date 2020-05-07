@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 //이전과 마찬가지로 factory를 scriptable object로 정의
 [CreateAssetMenu]
-public class GameTileContentFactory : ScriptableObject
+public class GameTileContentFactory : GameObjectFactory
 {
-    Scene contentScene;
     [SerializeField] GameTileContent destinationPrefab = default;
     [SerializeField] GameTileContent emptyPrefab = default;
     [SerializeField] GameTileContent wallPrefab = default;
@@ -19,9 +17,8 @@ public class GameTileContentFactory : ScriptableObject
 
     GameTileContent Get(GameTileContent prefab)
     {
-        GameTileContent instance = Instantiate(prefab); //객체의 생성을 담당함
-        instance.OriginFactory = this; //객체에는, 어느 factory에서 생긴 것인지 등록해 놓음
-        MoveToFactoryScene(instance.gameObject);
+        GameTileContent instance = CreateGameObjectInstance(prefab); //이제는 base class에서 생성 및 이동을 담당
+        instance.OriginFactory = this; 
         return instance;
     }
 
@@ -39,23 +36,4 @@ public class GameTileContentFactory : ScriptableObject
         return null;
     }
 
-    void MoveToFactoryScene(GameObject o) //특정 게임오브젝트를 특정 scene으로 옮김
-    {
-        if(!contentScene.isLoaded)
-        {
-            if(Application.isEditor)
-            {
-                contentScene = SceneManager.GetSceneByName(name);
-                if(!contentScene.isLoaded)
-                {
-                    contentScene = SceneManager.CreateScene(name);
-                }
-            }
-            else
-            {
-                contentScene = SceneManager.CreateScene(name);
-            }
-        }
-        SceneManager.MoveGameObjectToScene(o, contentScene);
-    }
 }
