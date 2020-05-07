@@ -11,6 +11,8 @@ public class DefenseGame : MonoBehaviour
     [SerializeField, Range(0.1f, 10f)] float spawnSpeed = 1f; //enemy 생성 속도 파라메터
     float spawnProgress;
 
+    EnemyCollection enemies = new EnemyCollection();
+
     Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
 
     private void Awake()
@@ -55,6 +57,8 @@ public class DefenseGame : MonoBehaviour
             spawnProgress -= 1f;
             SpawnEnemy();
         }
+
+        enemies.GameUpdate();
     }
 
     private void HandleAlternativeTouch()
@@ -87,5 +91,6 @@ public class DefenseGame : MonoBehaviour
         GameTile spawnPoint = board.GetSpawnPoint(UnityEngine.Random.Range(0, board.spawnPointCount));
         Enemy enemy = enemyFactory.Get();
         enemy.SpawnOn(spawnPoint);
+        enemies.Add(enemy);
     }
 }
