@@ -1,28 +1,32 @@
 ﻿using UnityEngine;
 
-public enum GameTileContentType
+namespace Defense
 {
-    Empty, Destination, Wall, SpawnPoint
-}
-
-public class GameTileContent : MonoBehaviour
-{
-    [SerializeField] GameTileContentType type = default;
-    public GameTileContentType Type => type;
-
-    GameTileContentFactory originFactory;
-    public GameTileContentFactory OriginFactory
+    public enum GameTileContentType
     {
-        get => originFactory;
-        set
+        Empty, Destination, Wall, SpawnPoint
+    }
+
+    public class GameTileContent : MonoBehaviour
+    {
+        [SerializeField] GameTileContentType type = default;
+        public GameTileContentType Type => type;
+
+        GameTileContentFactory originFactory;
+        public GameTileContentFactory OriginFactory
         {
-            Debug.Assert(originFactory == null, "Redefined origin factory!");
-            originFactory = value;
+            get => originFactory;
+            set
+            {
+                Debug.Assert(originFactory == null, "Redefined origin factory!");
+                originFactory = value;
+            }
+        }
+
+        public void Recycle()
+        {
+            originFactory.Reclaim(this);
         }
     }
-    
-    public void Recycle()
-    {
-        originFactory.Reclaim(this);
-    }
+
 }

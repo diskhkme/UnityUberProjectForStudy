@@ -1,96 +1,100 @@
 ﻿using System;
 using UnityEngine;
 
-public class DefenseGame : MonoBehaviour
+namespace Defense
 {
-    [SerializeField] Vector2Int boardSize = new Vector2Int(11, 11);
-    [SerializeField] GameBoard board = default;
-    [SerializeField] GameTileContentFactory tileContentFactory = default;
-
-    [SerializeField] EnemyFactory enemyFactory = default; //enemy 생성 factory에 대한 참조
-    [SerializeField, Range(0.1f, 10f)] float spawnSpeed = 1f; //enemy 생성 속도 파라메터
-    float spawnProgress;
-
-    EnemyCollection enemies = new EnemyCollection();
-
-    Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
-
-    private void Awake()
+    public class DefenseGame : MonoBehaviour
     {
-        board.Initialize(boardSize,tileContentFactory);
-        board.ShowGrid = true;
-    }
+        [SerializeField] Vector2Int boardSize = new Vector2Int(11, 11);
+        [SerializeField] GameBoard board = default;
+        [SerializeField] GameTileContentFactory tileContentFactory = default;
 
-    private void OnValidate()
-    {
-        if (boardSize.x < 2)
-            boardSize.x = 2;
-        if (boardSize.y < 2)
-            boardSize.y = 2;
-    }
+        [SerializeField] EnemyFactory enemyFactory = default; //enemy 생성 factory에 대한 참조
+        [SerializeField, Range(0.1f, 10f)] float spawnSpeed = 1f; //enemy 생성 속도 파라메터
+        float spawnProgress;
 
-    private void Update()
-    {
-        if(Input.GetMouseButtonDown(1))
+        EnemyCollection enemies = new EnemyCollection();
+
+        Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        private void Awake()
         {
-            HandleAlternativeTouch();
-            
-        }
-        else if(Input.GetMouseButtonDown(0))
-        {
-            HandleTouch();
+            board.Initialize(boardSize, tileContentFactory);
+            board.ShowGrid = true;
         }
 
-        if(Input.GetKeyDown(KeyCode.V))
+        private void OnValidate()
         {
-            board.ShowPaths = !board.ShowPaths;
+            if (boardSize.x < 2)
+                boardSize.x = 2;
+            if (boardSize.y < 2)
+                boardSize.y = 2;
         }
 
-        if (Input.GetKeyDown(KeyCode.G))
+        private void Update()
         {
-            board.ShowGrid = !board.ShowGrid;
-        }
-
-        spawnProgress += spawnSpeed * Time.deltaTime;
-        while(spawnProgress >= 1f)
-        {
-            spawnProgress -= 1f;
-            SpawnEnemy();
-        }
-
-        enemies.GameUpdate();
-    }
-
-    private void HandleAlternativeTouch()
-    {
-        GameTile tile = board.GetTile(TouchRay);
-        if(tile != null)
-        {
-            if(Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetMouseButtonDown(1))
             {
-                board.ToggleDestination(tile);
+                HandleAlternativeTouch();
+
             }
-            else
+            else if (Input.GetMouseButtonDown(0))
             {
-                board.ToggleSpawnPoint(tile);
+                HandleTouch();
+            }
+
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                board.ShowPaths = !board.ShowPaths;
+            }
+
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                board.ShowGrid = !board.ShowGrid;
+            }
+
+            spawnProgress += spawnSpeed * Time.deltaTime;
+            while (spawnProgress >= 1f)
+            {
+                spawnProgress -= 1f;
+                SpawnEnemy();
+            }
+
+            enemies.GameUpdate();
+        }
+
+        private void HandleAlternativeTouch()
+        {
+            GameTile tile = board.GetTile(TouchRay);
+            if (tile != null)
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    board.ToggleDestination(tile);
+                }
+                else
+                {
+                    board.ToggleSpawnPoint(tile);
+                }
             }
         }
-    }
 
-    void HandleTouch()
-    {
-        GameTile tile = board.GetTile(TouchRay);
-        if(tile != null)
+        void HandleTouch()
         {
-            board.ToggleWall(tile);
+            GameTile tile = board.GetTile(TouchRay);
+            if (tile != null)
+            {
+                board.ToggleWall(tile);
+            }
+        }
+
+        void SpawnEnemy()
+        {
+            GameTile spawnPoint = board.GetSpawnPoint(UnityEngine.Random.Range(0, board.spawnPointCount));
+            Enemy enemy = enemyFactory.Get();
+            enemy.SpawnOn(spawnPoint);
+            enemies.Add(enemy);
         }
     }
 
-    void SpawnEnemy()
-    {
-        GameTile spawnPoint = board.GetSpawnPoint(UnityEngine.Random.Range(0, board.spawnPointCount));
-        Enemy enemy = enemyFactory.Get();
-        enemy.SpawnOn(spawnPoint);
-        enemies.Add(enemy);
-    }
 }

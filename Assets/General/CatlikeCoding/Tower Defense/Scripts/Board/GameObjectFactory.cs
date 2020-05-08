@@ -1,30 +1,33 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-//enemy와 tile의 factory base class
-public abstract class GameObjectFactory : ScriptableObject
+namespace Defense
 {
-    Scene scene;
-
-    protected T CreateGameObjectInstance<T>(T prefab) where T : MonoBehaviour
+    //enemy와 tile의 factory base class
+    public abstract class GameObjectFactory : ScriptableObject
     {
-        if (!scene.isLoaded)
+        Scene scene;
+
+        protected T CreateGameObjectInstance<T>(T prefab) where T : MonoBehaviour
         {
-            if (Application.isEditor)
+            if (!scene.isLoaded)
             {
-                scene = SceneManager.GetSceneByName(name);
-                if (!scene.isLoaded)
+                if (Application.isEditor)
+                {
+                    scene = SceneManager.GetSceneByName(name);
+                    if (!scene.isLoaded)
+                    {
+                        scene = SceneManager.CreateScene(name);
+                    }
+                }
+                else
                 {
                     scene = SceneManager.CreateScene(name);
                 }
             }
-            else
-            {
-                scene = SceneManager.CreateScene(name);
-            }
+            T instance = Instantiate(prefab);
+            SceneManager.MoveGameObjectToScene(instance.gameObject, scene);
+            return instance;
         }
-        T instance = Instantiate(prefab);
-        SceneManager.MoveGameObjectToScene(instance.gameObject, scene);
-        return instance;
     }
 }
