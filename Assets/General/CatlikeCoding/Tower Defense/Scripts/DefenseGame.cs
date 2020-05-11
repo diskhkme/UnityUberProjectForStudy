@@ -61,6 +61,11 @@ namespace Defense
             }
 
             enemies.GameUpdate();
+            Physics.SyncTransforms(); 
+            //적이 생성 후에  spawn 위치로 가기 때문에, physics engine과 sync되지 않으면 targeting system이 제대로 동작하지 않음
+            //따라서 적 업데이트 이후에 synchronization을 한 뒤에 targeting system을 invoke하는 board의 gameupdate를 수행해 주어야 함
+
+            board.GameUpdate();
         }
 
         private void HandleAlternativeTouch()

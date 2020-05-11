@@ -7,6 +7,7 @@ namespace Defense
         Empty, Destination, Wall, SpawnPoint, Tower
     }
 
+    [SelectionBase] //scene view에서 객체를 선택할 때 root object가 선택되도록 하는 attrubute
     public class GameTileContent : MonoBehaviour
     {
         [SerializeField] GameTileContentType type = default;
@@ -24,6 +25,8 @@ namespace Defense
                 originFactory = value;
             }
         }
+
+        public virtual void GameUpdate() {}
 
         public void Recycle()
         {

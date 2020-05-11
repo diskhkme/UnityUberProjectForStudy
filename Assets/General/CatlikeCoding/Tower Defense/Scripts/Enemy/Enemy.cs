@@ -22,6 +22,8 @@ namespace Defense
         float speed;
 
 
+        public float Scale { get; private set; }
+
         public EnemyFactory OriginFactory
         {
             get => originFactory;
@@ -44,6 +46,7 @@ namespace Defense
         public void Initialize(float scale, float pathOffset, float speed)
         {
             model.localScale = new Vector3(scale, scale, scale);
+            this.Scale = scale;
             this.pathOffset = pathOffset;
             this.speed = speed;
         }
