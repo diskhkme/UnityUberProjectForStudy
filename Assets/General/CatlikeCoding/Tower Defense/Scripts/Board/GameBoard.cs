@@ -234,6 +234,29 @@ namespace Defense
         {
             return spawnPoints[index];
         }
+
+        public void ToggleTower(GameTile tile)
+        {
+            if (tile.Content.Type == GameTileContentType.Tower)
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                FindPaths();
+            }
+            else if (tile.Content.Type == GameTileContentType.Empty)
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Tower);
+                if (!FindPaths())
+                {
+                    tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                    FindPaths();
+                }
+            }
+            else if (tile.Content.Type == GameTileContentType.Wall) //wall에서 바로 tower로 바꾸는 것을 지원
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Tower); 
+                //이때는 findPath 갱신 불필요
+            }
+        }
     }
 
 }

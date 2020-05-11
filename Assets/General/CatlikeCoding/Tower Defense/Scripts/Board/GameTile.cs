@@ -87,7 +87,7 @@ namespace Defense
             neighbor.nextOnPath = this;
             neighbor.ExitPoint = neighbor.transform.localPosition + direction.GetHalfVector();
             neighbor.PathDirection = direction;
-            return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null; //wall이면 null 반환
+            return neighbor.Content.BlocksPath ? null : neighbor;
         }
 
         public void ShowPath()

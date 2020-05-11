@@ -10,6 +10,7 @@ namespace Defense
         [SerializeField] GameTileContent emptyPrefab = default;
         [SerializeField] GameTileContent wallPrefab = default;
         [SerializeField] GameTileContent spawnPointPrefab = default;
+        [SerializeField] Tower towerPrefab = default;
 
         public void Reclaim(GameTileContent content)
         {
@@ -33,6 +34,7 @@ namespace Defense
                 case GameTileContentType.Empty: return Get(emptyPrefab);
                 case GameTileContentType.Wall: return Get(wallPrefab);
                 case GameTileContentType.SpawnPoint: return Get(spawnPointPrefab);
+                case GameTileContentType.Tower: return Get(towerPrefab);
             }
             Debug.Assert(false, "Unsupported type: " + type);
             return null;
