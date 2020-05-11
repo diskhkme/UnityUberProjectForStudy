@@ -4,21 +4,46 @@ namespace Defense
 {
     public class Tower : GameTileContent
     {
-        static Collider[] targetsBuffer = new Collider[1]; //overlab에서 반복적 allocation을 방지
+        static Collider[] targetsBuffer = new Collider[100]; //overlab에서 반복적 allocation을 방지
         const int enemyLayerMask = 1 << 10;
         
         [SerializeField, Range(1.5f, 10.5f)] float targetingRange = 1.5f;
-
-        TargetPoint target;
+        [SerializeField, Range(1f, 100f)] float damagePerSecond = 10f;
+        [SerializeField] Transform turret = default, laserBeam = default;
         
-
+        TargetPoint target;
+        Vector3 laserBeamScale;
+                
         public override void GameUpdate()
         {
             if(TrackTarget() || AcquireTarget())
             {
-                Debug.Log("Lock on target...");
+                Shoot();
             }
-            
+            else
+            {
+                laserBeam.localScale = Vector3.zero;
+            }
+        }
+
+        private void Awake()
+        {
+            laserBeamScale = laserBeam.localScale;
+        }
+
+        private void Shoot()
+        {
+            Vector3 point = target.Position;
+            turret.LookAt(point);
+            laserBeam.localRotation = turret.localRotation;
+
+            float d = Vector3.Distance(turret.position, point);
+            laserBeamScale.z = d;
+            laserBeam.localScale = laserBeamScale;
+
+            laserBeam.localPosition = turret.localPosition + 0.5f * d * laserBeam.forward;
+
+            target.Enemy.ApplyDamage(damagePerSecond * Time.deltaTime);
         }
 
         void OnDrawGizmosSelected() //tower의 range을 보여주되, 선택된 객체에 대해서만 보여줌
@@ -43,7 +68,7 @@ namespace Defense
 
             if (hits > 0)
             {
-                target = targetsBuffer[0].GetComponent<TargetPoint>();
+                target = targetsBuffer[Random.Range(0,hits)].GetComponent<TargetPoint>();
                 Debug.Assert(target != null, "Targeted non-enemy!", targetsBuffer[0]);
                 return true;
             }

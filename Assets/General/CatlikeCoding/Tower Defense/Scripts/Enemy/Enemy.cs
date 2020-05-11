@@ -21,7 +21,7 @@ namespace Defense
         float pathOffset; //enemy의 좌우 이동경로 offset
         float speed;
 
-
+        float Health { get; set; }
         public float Scale { get; private set; }
 
         public EnemyFactory OriginFactory
@@ -49,10 +49,17 @@ namespace Defense
             this.Scale = scale;
             this.pathOffset = pathOffset;
             this.speed = speed;
+            Health = 100f * scale;
         }
 
         public bool GameUpdate()
         {
+            if(Health <= 0f) //health가 0이 되는 시점에서 반환하는 것이 아니라, 다음 frame update 초반에 함으로써, 여러 타워가 동시에 같은 대상을 보고있을때 제거하는 처리를 간단히 함!
+            {
+                OriginFactory.Reclaim(this);
+                return false;
+            }
+
             progress += Time.deltaTime * progressFactor; //상태에 따라 이동거리가 다르므로 progressFactor로 보전
             while (progress >= 1f)
             {
@@ -77,6 +84,12 @@ namespace Defense
                 transform.localRotation = Quaternion.Euler(0f, angle, 0f);
             }
             return true;
+        }
+
+        public void ApplyDamage(float damage)
+        {
+            Debug.Assert(damage >= 0f, "Nagative damage applied");
+            Health -= damage;
         }
 
         void PrepareIntro()
