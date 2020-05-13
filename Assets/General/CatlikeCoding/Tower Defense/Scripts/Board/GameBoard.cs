@@ -246,17 +246,26 @@ namespace Defense
             return spawnPoints[index];
         }
 
-        public void ToggleTower(GameTile tile)
+        public void ToggleTower(GameTile tile, TowerType towerType)
         {
             if (tile.Content.Type == GameTileContentType.Tower)
             {
                 updatingContent.Remove(tile.Content);
-                tile.Content = contentFactory.Get(GameTileContentType.Empty);
-                FindPaths();
+                if(((Tower)tile.Content).TowerType == towerType) //타워 타일에 같은 타워를 다시 만드려고 하면 empty로 바꿈
+                {
+                    tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                    FindPaths();
+                }
+                else //다른 타워를 만드는 거면 update
+                {
+                    tile.Content = contentFactory.Get(towerType);
+                    updatingContent.Add(tile.Content);
+                }
+                
             }
             else if (tile.Content.Type == GameTileContentType.Empty)
             {
-                tile.Content = contentFactory.Get(GameTileContentType.Tower);
+                tile.Content = contentFactory.Get(towerType);
                 if (FindPaths())
                 {
                     updatingContent.Add(tile.Content);
@@ -269,7 +278,7 @@ namespace Defense
             }
             else if (tile.Content.Type == GameTileContentType.Wall) //wall에서 바로 tower로 바꾸는 것을 지원
             {
-                tile.Content = contentFactory.Get(GameTileContentType.Tower);//이때는 findPath 갱신 불필요
+                tile.Content = contentFactory.Get(towerType);//이때는 findPath 갱신 불필요
                 updatingContent.Add(tile.Content);
             }
         }

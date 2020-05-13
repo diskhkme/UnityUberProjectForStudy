@@ -15,6 +15,9 @@ namespace Defense
 
         EnemyCollection enemies = new EnemyCollection();
 
+        TowerType selectedTowerType;
+
+
         Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
 
         private void Awake()
@@ -51,6 +54,15 @@ namespace Defense
             if (Input.GetKeyDown(KeyCode.G))
             {
                 board.ShowGrid = !board.ShowGrid;
+            }
+
+            if(Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                selectedTowerType = TowerType.Laser;
+            }
+            else if(Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                selectedTowerType = TowerType.Mortar;
             }
 
             spawnProgress += spawnSpeed * Time.deltaTime;
@@ -91,7 +103,7 @@ namespace Defense
             {
                 if(Input.GetKey(KeyCode.LeftShift))
                 {
-                    board.ToggleTower(tile);
+                    board.ToggleTower(tile, selectedTowerType);
                 }
                 else
                 {
