@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Defense
 {
-    public class Enemy : MonoBehaviour
+    public class Enemy : GameBehavior
     {
         [SerializeField] Transform model = default;
 
@@ -52,7 +52,7 @@ namespace Defense
             Health = 100f * scale;
         }
 
-        public bool GameUpdate()
+        public override bool GameUpdate()
         {
             if(Health <= 0f) //health가 0이 되는 시점에서 반환하는 것이 아니라, 다음 frame update 초반에 함으로써, 여러 타워가 동시에 같은 대상을 보고있을때 제거하는 처리를 간단히 함!
             {

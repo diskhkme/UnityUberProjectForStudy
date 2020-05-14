@@ -8,11 +8,8 @@ namespace Defense
     }
 
     public abstract class Tower : GameTileContent
-    {
-        static Collider[] targetsBuffer = new Collider[100]; //overlab에서 반복적 allocation을 방지
-        const int enemyLayerMask = 1 << 10;
-        
-        [SerializeField, Range(1.5f, 10.5f)] float targetingRange = 1.5f;
+    {         
+        [SerializeField, Range(1.5f, 10.5f)] protected float targetingRange = 1.5f;
 
         public abstract TowerType TowerType { get; }
 
@@ -26,16 +23,9 @@ namespace Defense
 
         protected bool AcquireTarget(out TargetPoint target)
         {
-            Vector3 a = transform.localPosition;
-            Vector3 b = a;
-            b.y += 3f;
-            int hits = Physics.OverlapCapsuleNonAlloc(a, b, targetingRange, targetsBuffer, enemyLayerMask);
-            //높이 때문에 capsule overlap test로 변경, 새 배열을 할당 안하는 nonalloc overlab test method 사용
-
-            if (hits > 0)
+            if(TargetPoint.FillBuffer(transform.localPosition,targetingRange))
             {
-                target = targetsBuffer[Random.Range(0, hits)].GetComponent<TargetPoint>();
-                Debug.Assert(target != null, "Targeted non-enemy!", targetsBuffer[0]);
+                target = TargetPoint.RandomBuffered;
                 return true;
             }
             target = null;
