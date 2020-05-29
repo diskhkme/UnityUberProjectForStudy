@@ -9,9 +9,11 @@ public class MapGenerator : MonoBehaviour
     public int seed = 10;
 
     [Range(0,1)] public float outlinePercent;
+    [Range(0, 1)] public float obstclePercent;
 
     List<Coord> allTileCoords;
     Queue<Coord> shuffledTileCoords;
+    Coord mapCenter;
 
     private void Start()
     {
@@ -29,6 +31,7 @@ public class MapGenerator : MonoBehaviour
             }
         }
         shuffledTileCoords = new Queue<Coord>(Utility.ShuffleArray(allTileCoords.ToArray(), seed));
+        mapCenter = new Coord((int)(mapSize.x / 2), (int)(mapSize.y / 2));
 
         string holderName = "Generated Map";
         if(transform.Find(holderName))
@@ -51,15 +54,76 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        int obstacleCount = 10;
+        bool[,] obstacleMap = new bool[(int)mapSize.x, (int)mapSize.y];
+
+        int obstacleCount = (int)((mapSize.x*mapSize.y) * obstclePercent);
+        int currentObstacleCount = 0;
         for(int i=0;i<obstacleCount;i++)
         {
             Coord randomCoord = GetRandomCoord();
-            Vector3 obstaclePosition = CoordToPosition(randomCoord.x, randomCoord.y);
-            Transform newObstacle = Instantiate(obstaclePrefab, obstaclePosition + Vector3.up*0.5f, Quaternion.identity) as Transform;
-            newObstacle.parent = mapHolder;
+            obstacleMap[randomCoord.x, randomCoord.y] = true;
+            currentObstacleCount++;
+
+            //맵의 가운데는 막히지 않게
+            if (randomCoord != mapCenter && MapIsFullyAccessible(obstacleMap,currentObstacleCount))
+            {
+                Vector3 obstaclePosition = CoordToPosition(randomCoord.x, randomCoord.y);
+                Transform newObstacle = Instantiate(obstaclePrefab, obstaclePosition + Vector3.up * 0.5f, Quaternion.identity) as Transform;
+                newObstacle.parent = mapHolder;
+            }
+            else
+            {
+                obstacleMap[randomCoord.x, randomCoord.y] = false;
+                currentObstacleCount--;
+            }
+            
         }
 
+    }
+
+    //Map이 완전히 닫히지 않도록 하기 위해
+    bool MapIsFullyAccessible(bool[,] obstacleMap, int currentObstacleCount)
+    {
+        //floodfill algorithm
+        bool[,] mapFlags = new bool[obstacleMap.GetLength(0),obstacleMap.GetLength(1)];
+        Queue<Coord> queue = new Queue<Coord>();
+
+        queue.Enqueue(mapCenter);
+        mapFlags[mapCenter.y, mapCenter.y] = true;
+
+        int accessibleTileCount = 1;
+
+        while(queue.Count > 0)
+        {
+            Coord tile = queue.Dequeue();
+
+            for(int x=-1;x<=1;x++)
+            {
+                for(int y=-1;y<=1;y++)
+                {
+                    int neighborX = tile.x + x;
+                    int neighborY = tile.y + y;
+                    if(x == 0 || y == 0) //diagonal은 체크안함
+                    {
+                        //outside는 제외
+                        if(neighborX >= 0 && neighborX < obstacleMap.GetLength(0) && neighborY >= 0 && neighborY < obstacleMap.GetLength(1))
+                        {
+                            //아직 체크하지 않았고, obstacle이 없으면
+                            if(!mapFlags[neighborX,neighborY] && !obstacleMap[neighborX,neighborY])
+                            {
+                                mapFlags[neighborX, neighborY] = true; //체크 했음
+                                queue.Enqueue(new Coord(neighborX, neighborY)); //큐에 넣음
+                                accessibleTileCount++; //중심에서 시작해서 접근가능한 타일의 개수
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+        int targetAccessibleTileCount = (int)(mapSize.x * mapSize.y - currentObstacleCount);
+        return targetAccessibleTileCount == accessibleTileCount;
     }
 
     Vector3 CoordToPosition(int x, int y)
@@ -82,6 +146,28 @@ public class MapGenerator : MonoBehaviour
         public Coord(int _x, int _y)
         {
             x = _x; y = _y;
+        }
+
+        public static bool operator ==(Coord lhs, Coord rhs)
+        {
+            return Equals(lhs, rhs);
+        }
+        public static bool operator !=(Coord lhs, Coord rhs)
+        {
+            return !Equals(lhs, rhs);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is Coord coord)
+            {
+                if(this.x == coord.x && this.y == coord.y)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
     }
 }
