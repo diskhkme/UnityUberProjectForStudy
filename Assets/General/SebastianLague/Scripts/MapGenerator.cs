@@ -21,8 +21,16 @@ public class MapGenerator : MonoBehaviour
 
     Map currentMap;
 
-    private void Start()
+    //Nullreference error를 피하기 위해 Awake로 수정
+    //새 게임을 시작할때 onnewwave를 제대로 subscribe를 못하여 문제 발생함
+    private void Awake()
     {
+        FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
+    }
+
+    void OnNewWave(int waveNumber)
+    {
+        mapIndex = waveNumber - 1;
         GenerateMap();
     }
 

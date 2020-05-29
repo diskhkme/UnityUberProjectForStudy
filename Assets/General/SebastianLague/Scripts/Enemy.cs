@@ -36,7 +36,7 @@ public class Enemy : LivingEntity
         skinMaterial = GetComponent<Renderer>().material;
         originalColor = skinMaterial.color;
 
-        if(GameObject.FindGameObjectWithTag("Player").transform != null)
+        if(GameObject.FindGameObjectWithTag("Player") != null)
         {
             target = GameObject.FindGameObjectWithTag("Player").transform;
             targetEntity = target.GetComponent<LivingEntity>();

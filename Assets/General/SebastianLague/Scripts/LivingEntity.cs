@@ -31,6 +31,7 @@ public class LivingEntity : MonoBehaviour, IDamageable
         }
     }
 
+    [ContextMenu("Self Destruct")] //스크립트를 우클릭하면 메뉴가 생겨서 바로 실행 가능!
     protected void Die()
     {
         dead = true;
