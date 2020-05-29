@@ -6,10 +6,16 @@ public class MapEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI(); //property들 그림
-
+        //base.OnInspectorGUI(); //property들 그림
         MapGenerator map = target as MapGenerator;
-
-        map.GenerateMap();
+        if (DrawDefaultInspector()) //값이 바뀌었을 때
+        {
+            map.GenerateMap();
+        }
+        
+        if(GUILayout.Button("Generate Map"))
+        {
+            map.GenerateMap();
+        }
     }
 }
