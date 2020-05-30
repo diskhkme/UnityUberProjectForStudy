@@ -18,7 +18,7 @@ public class Projectile : MonoBehaviour
 
         if(initialCollisions.Length > 0)
         {
-            OnHitObject(initialCollisions[0]);
+            OnHitObject(initialCollisions[0], transform.position);
         }
     }
 
@@ -42,26 +42,16 @@ public class Projectile : MonoBehaviour
         //skinWidth로 적과 총알이 동시에 움직이면서 생기는 intersection 문제를 해결
         if(Physics.Raycast(ray, out hit, moveDistance + skinWidth, collisionMask, QueryTriggerInteraction.Collide))
         {
-            OnHitObject(hit);
+            OnHitObject(hit.collider, hit.point);
         }
     }
 
-    void OnHitObject(RaycastHit hit)
-    {
-        IDamageable damageableObject = hit.collider.GetComponent<IDamageable>();
-        if(damageableObject != null)
-        {
-            damageableObject.TakeHit(damage, hit);
-        }
-        GameObject.Destroy(gameObject);
-    }
-
-    void OnHitObject(Collider c)
+    void OnHitObject(Collider c, Vector3 hitpoint)
     {
         IDamageable damageableObject = c.GetComponent<IDamageable>();
         if (damageableObject != null)
         {
-            damageableObject.TakeDamage(damage);
+            damageableObject.TakeHit(damage, hitpoint, transform.forward);
         }
         GameObject.Destroy(gameObject);
     }
