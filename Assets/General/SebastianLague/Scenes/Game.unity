@@ -10613,5 +10613,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponHold: {fileID: 15903628}
-  startingGun: {fileID: 7138290666226860704, guid: 11ca7f4fd182742449edb43258b816ba,
+  startingGun: {fileID: 4262280813837705816, guid: f6ff156f6c9aff74196db3e4b607cb4a,
     type: 3}
