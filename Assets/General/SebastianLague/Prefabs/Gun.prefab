@@ -31,7 +31,7 @@ Transform:
   - {fileID: 3948886985073572109}
   - {fileID: 428037165277455119}
   m_Father: {fileID: 6426068263352267882}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &119826258985408450
 GameObject:
@@ -61,7 +61,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6426068263352267882}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 28.362001}
 --- !u!1 &292538240158532139
 GameObject:
@@ -430,6 +430,66 @@ Transform:
   m_Father: {fileID: 6426068263352267882}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5170056359109817313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4022930721651659319}
+  m_Layer: 0
+  m_Name: Projectile Spawn 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4022930721651659319
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5170056359109817313}
+  m_LocalRotation: {x: 0, y: 0.08715578, z: 0, w: 0.9961947}
+  m_LocalPosition: {x: 0.115, y: 0.184, z: 0.556}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6426068263352267882}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 10, z: 0}
+--- !u!1 &6387664285068619835
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7649403955455729971}
+  m_Layer: 0
+  m_Name: Projectile Spawn 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7649403955455729971
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6387664285068619835}
+  m_LocalRotation: {x: 0, y: -0.08715578, z: 0, w: 0.9961947}
+  m_LocalPosition: {x: -0.115, y: 0.184, z: 0.556}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6426068263352267882}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: -10, z: 0}
 --- !u!1 &7258593331383760497
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,7 +500,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8298611184582621439}
   m_Layer: 0
-  m_Name: Projectile Spawn
+  m_Name: Projectile Spawn 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -458,7 +518,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6426068263352267882}
-  m_RootOrder: 1
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8282176940498219595
 GameObject:
@@ -569,9 +629,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4465222787577096122}
-  - {fileID: 8298611184582621439}
   - {fileID: 4534627071468147906}
   - {fileID: 19013023643097401}
+  - {fileID: 7649403955455729971}
+  - {fileID: 8298611184582621439}
+  - {fileID: 4022930721651659319}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -587,11 +649,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b318412d54e726c40a39afcfcd9e3cad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  muzzle: {fileID: 8298611184582621439}
+  fireMode: 0
+  projectileSpawn:
+  - {fileID: 7649403955455729971}
+  - {fileID: 8298611184582621439}
+  - {fileID: 4022930721651659319}
   projectile: {fileID: 4023696546528458898, guid: b4b54b2b18d3cc043913364ad25ddee7,
     type: 3}
   msBetweenShots: 100
   muzzleVelocity: 35
+  burstCount: 3
   shell: {fileID: 8305404329651524420, guid: 3fad625e36b978e429aa7c5a06cc96a6, type: 3}
   shellEjection: {fileID: 4534627071468147906}
 --- !u!114 &1843180018443951179
