@@ -649,7 +649,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b318412d54e726c40a39afcfcd9e3cad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireMode: 0
+  fireMode: 2
   projectileSpawn:
   - {fileID: 7649403955455729971}
   - {fileID: 8298611184582621439}

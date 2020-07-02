@@ -91,7 +91,8 @@ public class Spawner : MonoBehaviour
         }
 
         Material tileMat = spawnTile.GetComponent<Renderer>().material;
-        Color initialColor = tileMat.color;
+        //스폰 중 빨간색으로 타일이 남는 문제
+        Color initialColor = Color.white;
         Color flashColor = Color.red;
         float spawnTimer = 0f;
 
