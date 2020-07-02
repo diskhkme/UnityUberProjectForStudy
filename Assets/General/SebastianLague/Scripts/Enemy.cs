@@ -29,25 +29,31 @@ public class Enemy : LivingEntity
     float targetCollisionRadius;
 
     bool hasTarget;
-    
+
+    private void Awake()
+    {
+        //SetCharacteristic의 missing reference 방지를 위해 참조 생성을 Awake로 옮겨옴
+        pathfinder = GetComponent<NavMeshAgent>();
+
+        if (GameObject.FindGameObjectWithTag("Player") != null)
+        {
+            hasTarget = true;
+            target = GameObject.FindGameObjectWithTag("Player").transform;
+            targetEntity = target.GetComponent<LivingEntity>();
+
+            myCollisionRadius = GetComponent<CapsuleCollider>().radius;
+            targetCollisionRadius = GetComponent<CapsuleCollider>().radius;
+        }
+    }
 
     protected override void Start()
     {
         base.Start();
-        pathfinder = GetComponent<NavMeshAgent>();
-        skinMaterial = GetComponent<Renderer>().material;
-        originalColor = skinMaterial.color;
 
-        if(GameObject.FindGameObjectWithTag("Player") != null)
+        if(hasTarget)
         {
-            target = GameObject.FindGameObjectWithTag("Player").transform;
-            targetEntity = target.GetComponent<LivingEntity>();
             targetEntity.OnDeath += OnTargetDeath;
             currentState = State.Chasing;
-            hasTarget = true;
-
-            myCollisionRadius = GetComponent<CapsuleCollider>().radius;
-            targetCollisionRadius = GetComponent<CapsuleCollider>().radius;
 
             StartCoroutine(UpdatePath());
         }
@@ -80,6 +86,21 @@ public class Enemy : LivingEntity
                     deathEffect.main.startLifetime.constant);
         }
         base.TakeHit(damage, hitpoint, hitDirection);
+    }
+
+    public void SetCharacteristics(float moveSpeed, int hitsToKillPlayer, float enemyHealth, Color skinColor)
+    {
+        pathfinder.speed = moveSpeed;
+        if(hasTarget)
+        {
+            damage = Mathf.Ceil(targetEntity.startingHealth / hitsToKillPlayer);
+        }
+
+        startingHealth = enemyHealth;
+
+        skinMaterial = GetComponent<Renderer>().material;
+        skinMaterial.color = skinColor;
+        originalColor = skinMaterial.color;
     }
 
     void OnTargetDeath()
