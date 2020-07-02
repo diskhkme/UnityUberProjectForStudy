@@ -24,6 +24,14 @@ public class GunController : MonoBehaviour
         equippedGun.transform.parent = weaponHold;
     }
 
+    public void Aim(Vector3 aimPoint)
+    {
+        if (equippedGun != null)
+        {
+            equippedGun.Aim(aimPoint);
+        }
+    }
+
     public void OnTriggerHold()
     {
         if(equippedGun != null)
@@ -37,6 +45,14 @@ public class GunController : MonoBehaviour
         if(equippedGun != null)
         {
             equippedGun.OnTriggerRelease();
+        }
+    }
+
+    public void Reload()
+    {
+        if (equippedGun != null)
+        {
+            equippedGun.Reload();
         }
     }
 
