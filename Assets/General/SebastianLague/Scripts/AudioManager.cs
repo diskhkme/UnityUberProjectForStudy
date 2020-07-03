@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    public enum AudioChannel { Master,Sfx,Music};
+
     float masterVolumePercent = 0.2f;
     float sfxVolumePercent = 1f;
     float musicVolumePercent = 1f;
 
+    AudioSource sfx2DSource;
     AudioSource[] musicSources;
     int activeMusicSourceIndex;
 
@@ -17,9 +20,19 @@ public class AudioManager : MonoBehaviour
     Transform audioListener;
     Transform playerT;
 
+    SoundLibrary library;
+
     private void Awake()
     {
+        if(instance != null)
+        {
+            Destroy(gameObject);
+        }
+
         instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        library = GetComponent<SoundLibrary>();
 
         musicSources = new AudioSource[2];
         for(int i=0;i<2;i++)
@@ -29,8 +42,16 @@ public class AudioManager : MonoBehaviour
             newMusicSource.transform.parent = this.transform;
         }
 
+        GameObject newSfx2DSource = new GameObject("2D sfx source");
+        sfx2DSource = newSfx2DSource.AddComponent<AudioSource>();
+        newSfx2DSource.transform.parent = this.transform;
+
         audioListener = FindObjectOfType<AudioListener>().transform;
         playerT = FindObjectOfType<Player>().transform;
+
+        masterVolumePercent = PlayerPrefs.GetFloat("master vol", masterVolumePercent);
+        sfxVolumePercent = PlayerPrefs.GetFloat("sfx vol", sfxVolumePercent);
+        musicVolumePercent = PlayerPrefs.GetFloat("music vol", musicVolumePercent);
     }
 
     private void Update()
@@ -39,6 +60,29 @@ public class AudioManager : MonoBehaviour
         {
             audioListener.position = playerT.position;
         }
+    }
+
+    public void SetVolume(float volumePercent, AudioChannel channel)
+    {
+        switch(channel)
+        {
+            case AudioChannel.Master:
+                masterVolumePercent = volumePercent;
+                break;
+            case AudioChannel.Sfx:
+                sfxVolumePercent = volumePercent;
+                break;
+            case AudioChannel.Music:
+                musicVolumePercent = volumePercent;
+                break;
+        }
+
+        musicSources[0].volume = musicVolumePercent * masterVolumePercent;
+        musicSources[1].volume = musicVolumePercent * masterVolumePercent;
+
+        PlayerPrefs.SetFloat("master vol", masterVolumePercent);
+        PlayerPrefs.SetFloat("sfx vol", sfxVolumePercent);
+        PlayerPrefs.SetFloat("music vol", musicVolumePercent);
     }
 
     public void PlayMusic(AudioClip clip, float fadeDuration = 1)
@@ -57,7 +101,16 @@ public class AudioManager : MonoBehaviour
             //중간에 볼륨을 바꿀 수 없음. 짧은 음향 효과 재생에 적합
             AudioSource.PlayClipAtPoint(clip, pos, sfxVolumePercent * masterVolumePercent);
         }
-        
+    }
+
+    public void PlaySound2D(string soundName)
+    {
+        sfx2DSource.PlayOneShot(library.GetClipFromName(soundName), sfxVolumePercent * masterVolumePercent);
+    }
+
+    public void PlaySound(string soundName, Vector3 pos)
+    {
+        PlaySound(library.GetClipFromName(soundName), pos);
     }
 
     IEnumerator AnimateMusicCrossfade(float duration)

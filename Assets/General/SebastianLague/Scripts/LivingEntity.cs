@@ -32,7 +32,7 @@ public class LivingEntity : MonoBehaviour, IDamageable
     }
 
     [ContextMenu("Self Destruct")] //스크립트를 우클릭하면 메뉴가 생겨서 바로 실행 가능!
-    protected void Die()
+    public virtual void Die() //플레이어 죽음 시에만 이펙트를 재생하도록 override
     {
         dead = true;
         if(OnDeath != null)
