@@ -11,12 +11,24 @@ public class Player : LivingEntity
     GunController gunController;
     Camera viewCamera;
 
-    protected override void Start()
+    private void Awake()
     {
-        base.Start();
+        //OnNewWave의 호출도 Start에서 이루어지기 때문에, 미리 등록을 확실히 하기 위해 Awake로 옮김
         controller = GetComponent<PlayerController>();
         gunController = GetComponent<GunController>();
         viewCamera = Camera.main;
+        FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+    }
+
+    void OnNewWave(int waveNumber)
+    {
+        health = startingHealth;
+        gunController.EquipGun(Random.Range(0, gunController.allGuns.Length));
     }
 
     void Update()

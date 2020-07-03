@@ -98,7 +98,8 @@ public class Enemy : LivingEntity
 
         startingHealth = enemyHealth;
 
-        skinMaterial = GetComponent<Renderer>().material;
+        //particle의 색도 같이 바꾸기 위해, sharedMaterial로 바꿈
+        skinMaterial = GetComponent<Renderer>().sharedMaterial;
         skinMaterial.color = skinColor;
         originalColor = skinMaterial.color;
     }
