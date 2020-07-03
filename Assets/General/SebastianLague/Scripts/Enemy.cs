@@ -11,6 +11,7 @@ public class Enemy : LivingEntity
     };
 
     public ParticleSystem deathEffect;
+    public static event System.Action OnDeathStatic;
 
     NavMeshAgent pathfinder;
     Transform target; //player
@@ -84,6 +85,10 @@ public class Enemy : LivingEntity
         //death effect 실행
         if(damage >= health)
         {
+            if(OnDeathStatic != null)
+            {
+                OnDeathStatic();
+            }
             AudioManager.instance.PlaySound("EnemyDeath", transform.position);
             Destroy(Instantiate(deathEffect.gameObject, hitpoint, Quaternion.FromToRotation(Vector3.forward, hitDirection)) as GameObject,
                     deathEffect.main.startLifetime.constant);
@@ -102,7 +107,10 @@ public class Enemy : LivingEntity
         startingHealth = enemyHealth;
 
         //particle의 색도 같이 바꾸기 위해, sharedMaterial로 바꿈
-        skinMaterial = GetComponent<Renderer>().sharedMaterial;
+        //공격 시에도 다 같이 색이 변하는 문제가 발생하여, particle shader를 새로 만듬
+        ParticleSystem.MainModule main = deathEffect.main;
+        main.startColor = new Color(skinColor.r, skinColor.g, skinColor.b, 1);
+        skinMaterial = GetComponent<Renderer>().material;
         skinMaterial.color = skinColor;
         originalColor = skinMaterial.color;
     }

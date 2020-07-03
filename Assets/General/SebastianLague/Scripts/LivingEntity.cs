@@ -4,7 +4,7 @@ using UnityEngine;
 public class LivingEntity : MonoBehaviour, IDamageable
 {
     public float startingHealth;
-    protected float health;
+    public float health { get; protected set; }
     protected bool dead;
 
     //적이 죽었을 경우, SpawnSystem이 알아야 하는데, 서로 의존성을 주는 것이 좋지 않으므로 event 사용
